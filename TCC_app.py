@@ -115,7 +115,7 @@ st.markdown(f"- **A_concrete**: {A_concrete:.4f} m²")
 st.markdown(f"- **I_concrete**: {I_concrete:.4e} m⁴")
 st.markdown(f"- **Neutral Axis Distances**: a_timber = {a_timber:.4f} m, a_concrete = {a_concrete:.4f} m")
 st.markdown(f"- **Effective Bending Stiffness (EI_eff)**: {EI_eff:.4e} Nm²")
-st.markdown(f"- **Gamma_concrete)**: {gamma_concrete:.4f}")
+st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
 
 # Calculate normal and bending stresses
 sigma_timber = (E_timber * a_timber * M_mid) / EI_eff
