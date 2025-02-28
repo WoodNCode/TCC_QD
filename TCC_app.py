@@ -154,6 +154,36 @@ st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
+def generate_formula_image():
+    """
+    Create a Matplotlib figure that renders the formulas in LaTeX and return
+    a BytesIO buffer containing the PNG image.
+    """
+    # Create a figure without axes
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.axis("off")
+    
+    # Define the formulas using LaTeX
+    formulas = r"""
+    \begin{align*}
+    \gamma_1 &= \frac{1}{1 + \frac{\pi^2 \, E_{\text{timber}} \, A_{\text{timber}} \, s}{k_{\text{ser}} \, L^2}} \\[8pt]
+    a_2 &= \frac{\gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} \, (h_{\text{concrete}} + h_{\text{timber}})}
+           {2\Bigl(\gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} + E_{\text{timber}} \, A_{\text{timber}}\Bigr)} \\[8pt]
+    a_1 &= \frac{h_{\text{timber}}}{2} - a_2 + \frac{h_{\text{concrete}}}{2} \\[8pt]
+    EI_{\text{eff}} &= E_{\text{timber}} \, I_{\text{timber}} + E_{\text{concrete}} \, I_{\text{concrete}} + 
+           E_{\text{timber}} \, A_{\text{timber}} \, a_1^2 + \gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} \, a_2^2
+    \end{align*}
+    """
+    # Display the formulas centered in the figure
+    ax.text(0.5, 0.5, formulas, horizontalalignment="center", verticalalignment="center",
+            fontsize=12, transform=ax.transAxes)
+    
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
 def generate_pdf():
     pdf = FPDF()
     pdf.add_page()
@@ -175,10 +205,9 @@ def generate_pdf():
     pdf.cell(0, 8, f"Slip Modulus per Connector (k_ser): {k_ser:.0f} N/m", ln=True)
     pdf.cell(0, 8, f"Point Load (P): {P:.0f} N", ln=True)
     pdf.cell(0, 8, f"Span Length (L): {L:.3f} m", ln=True)
-    
     pdf.ln(8)
     
-    # Cross-Section Plan (Text Description)
+    # Cross-Section Plan Description
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Cross-Section Plan", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -188,39 +217,44 @@ def generate_pdf():
         " - Timber beam: width = {:.3f} m, height = {:.3f} m.\n"
         "A neutral axis is drawn based on the computed value a_timber = {:.3f} m.".format(
             b_concrete, h_concrete, b_timber, h_timber, a_timber))
-    
     pdf.ln(8)
     
-    # Embed the SVG plan as a PNG image
-    # Ensure a file named "plan.svg" exists in your directory.
-    if os.path.exists("plan.svg"):
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
-            cairosvg.svg2png(url="plan.svg", write_to=tmp_file.name)
-            pdf.set_font("Arial", "B", 14)
-            pdf.cell(0, 10, "Cross-Section Plan (Image)", ln=True)
-            # Insert the image (adjust x, y, and w as needed)
-            current_y = pdf.get_y()
-            pdf.image(tmp_file.name, x=10, y=current_y, w=pdf.w - 20)
-        os.remove(tmp_file.name)
+    # --- Insert a Graphic: Cross-Section Plot ---
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.fill_between([-b_concrete/2, b_concrete/2], 0, h_concrete, color="gray", alpha=0.7, label="Concrete Slab")
+    ax.fill_between([-b_timber/2, b_timber/2], -h_timber, 0, color="saddlebrown", alpha=0.7, label="Timber Beam")
+    ax.scatter([0], [0], color="red", label="Connectors")
+    ax.axhline(0, color="black", linestyle="--", linewidth=0.8)
+    ax.axhline(-h_timber/2 + a_timber, color="blue", linestyle="-", linewidth=2, label="Neutral Axis")
+    ax.set_xlabel("Width (m)")
+    ax.set_ylabel("Height (m)")
+    ax.set_title("Cross-section of TCC Element")
+    ax.legend()
+    ax.grid(True)
     
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
+        fig.savefig(tmp_file.name, format="png", bbox_inches="tight")
+        tmp_plot_filename = tmp_file.name
+    plt.close(fig)
+    
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Cross-Section Graphic", ln=True)
+    current_y = pdf.get_y()
+    pdf.image(tmp_plot_filename, x=10, y=current_y, w=pdf.w - 20)
+    os.remove(tmp_plot_filename)
     pdf.ln(10)
     
-    # Formulas Section
+    # --- Insert Formulas as LaTeX Graphic ---
+    formula_buf = generate_formula_image()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_formula:
+        tmp_formula.write(formula_buf.getvalue())
+        tmp_formula_filename = tmp_formula.name
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Gamma Method Formulas", ln=True)
-    pdf.set_font("Arial", "", 12)
-    pdf.multi_cell(0, 8,
-        "1. Gamma factor:\n"
-        "   gamma_1 = 1 / (1 + (pi^2 * E_concrete * A_concrete * s) / (k_ser * L^2))\n\n"
-        "2. Neutral axis position:\n"
-        "   a_2 = (gamma_1 * E_concrete * A_concrete * (h_concrete + h_timber)) / "
-        "(2*(gamma_1 * E_concrete * A_concrete + E_timber * A_timber))\n"
-        "   a_1 = h_timber/2 - a_2 + h_concrete/2\n\n"
-        "3. Effective bending stiffness:\n"
-        "   EI_eff = E_timber*I_timber + E_concrete*I_concrete + "
-        "E_timber*A_timber*a_1^2 + gamma_1*E_concrete*A_concrete*a_2^2")
-    
-    pdf.ln(8)
+    current_y = pdf.get_y()
+    pdf.image(tmp_formula_filename, x=10, y=current_y, w=pdf.w - 20)
+    os.remove(tmp_formula_filename)
+    pdf.ln(10)
     
     # Results Section
     pdf.set_font("Arial", "B", 14)
@@ -235,7 +269,6 @@ def generate_pdf():
     pdf.cell(0, 8, f"Maximum Shear Stress in Timber: {tau_timber_max/1e6:.2f} MPa", ln=True)
     pdf.cell(0, 8, f"Force in Connector: {F_connector/1e3:.2f} kN", ln=True)
     
-    # Generate the PDF as a string and encode it
     pdf_data = pdf.output(dest="S").encode("latin1")
     return pdf_data
 
