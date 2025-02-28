@@ -154,7 +154,7 @@ st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
 # --- Generate PDF Button ---
 if st.button("Generate PDF Report", key="generate_pdf_report"):
-    pdf_data = generate_pdf()
+    pdf_data = generate_latex_pdf()
     st.download_button(
         label="Download PDF Report",
         data=pdf_data,
