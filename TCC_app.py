@@ -1,7 +1,8 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-
+import io
+from fpdf import FPDF
 
 st.title("TCC_QD EC5 Verification")
 
@@ -151,3 +152,97 @@ st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 
 st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
+
+# --- Generate PDF Button ---
+if st.button("Generate PDF Report"):
+    pdf_data = generate_pdf()
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_data,
+        file_name="TCC_Stress_Verification_Report.pdf",
+        mime="application/pdf"
+    )
+
+def generate_pdf():
+    # Create instance of FPDF class and add a page
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Set title and font
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "TCC Element Stress Verification Report", ln=True, align="C")
+    pdf.ln(10)
+    
+    # Input Parameters Section
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Input Parameters", ln=True)
+    pdf.set_font("Arial", "", 12)
+    pdf.cell(0, 8, f"Elastic Modulus of Timber: {E_timber_g:.1f} GPa", ln=True)
+    pdf.cell(0, 8, f"Elastic Modulus of Concrete: {E_concrete_g:.1f} GPa", ln=True)
+    pdf.cell(0, 8, f"Timber Section (h x b): {h_timber:.3f} m x {b_timber:.3f} m", ln=True)
+    pdf.cell(0, 8, f"Concrete Section (h x b): {h_concrete:.3f} m x {b_concrete:.3f} m", ln=True)
+    pdf.cell(0, 8, f"Connector Spacing (s): {s:.3f} m", ln=True)
+    pdf.cell(0, 8, f"Slip Modulus per Connector (k_ser): {k_ser:.0f} N/m", ln=True)
+    pdf.cell(0, 8, f"Point Load (P): {P:.0f} N", ln=True)
+    pdf.cell(0, 8, f"Span Length (L): {L:.3f} m", ln=True)
+    
+    pdf.ln(8)
+    
+    # Cross-Section (Plan) – as a schematic text description
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Cross-Section Plan", ln=True)
+    pdf.set_font("Arial", "", 12)
+    pdf.multi_cell(0, 8,
+        "The cross-section consists of a concrete slab over a timber beam.\n"
+        " - Concrete slab: width = {:.3f} m, height = {:.3f} m.\n"
+        " - Timber beam: width = {:.3f} m, height = {:.3f} m.\n"
+        "A neutral axis is drawn based on the computed value a_timber = {:.3f} m.".format(
+            b_concrete, h_concrete, b_timber, h_timber, a_timber))
+    
+    pdf.ln(8)
+    
+    # Formulas Section
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Gamma Method Formulas", ln=True)
+    pdf.set_font("Arial", "", 12)
+    pdf.multi_cell(0, 8,
+        "1. Gamma factor:\n"
+        "   gamma_1 = 1 / (1 + (pi^2 * E_concrete * A_concrete * s) / (k_ser * L^2))\n\n"
+        "2. Neutral axis position:\n"
+        "   a_2 = (gamma_1 * E_concrete * A_concrete * (h_concrete + h_timber)) / "
+        "(2*(gamma_1 * E_concrete * A_concrete + E_timber * A_timber))\n"
+        "   a_1 = h_timber/2 - a_2 + h_concrete/2\n\n"
+        "3. Effective bending stiffness:\n"
+        "   EI_eff = E_timber*I_timber + E_concrete*I_concrete + "
+        "E_timber*A_timber*a_1^2 + gamma_1*E_concrete*A_concrete*a_2^2")
+    
+    pdf.ln(8)
+    
+    # Results Section
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Calculated Results", ln=True)
+    pdf.set_font("Arial", "", 12)
+    pdf.cell(0, 8, f"Normal Stress in Timber: {sigma_timber/1e6:.2f} MPa", ln=True)
+    pdf.cell(0, 8, f"Bending Stress in Timber: {sigma_m_timber/1e6:.2f} MPa", ln=True)
+    pdf.cell(0, 8, f"Normal Stress in Concrete: {sigma_concrete/1e6:.2f} MPa", ln=True)
+    pdf.cell(0, 8, f"Bending Stress in Concrete: {sigma_m_concrete/1e6:.2f} MPa", ln=True)
+    pdf.cell(0, 8, f"Bending Moment in Concrete: {M_concrete/1e3:.2f} kNm", ln=True)
+    pdf.cell(0, 8, f"Normal Force in Concrete: {N_concrete/1e3:.2f} kN", ln=True)
+    pdf.cell(0, 8, f"Maximum Shear Stress in Timber: {tau_timber_max/1e6:.2f} MPa", ln=True)
+    pdf.cell(0, 8, f"Force in Connector: {F_connector/1e3:.2f} kN", ln=True)
+    
+    # Save PDF to memory
+    pdf_output = io.BytesIO()
+    pdf.output(pdf_output)
+    return pdf_output.getvalue()
+
+# --- Generate PDF Button ---
+if st.button("Generate PDF Report"):
+    pdf_data = generate_pdf()
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_data,
+        file_name="TCC_Stress_Verification_Report.pdf",
+        mime="application/pdf"
+    )
+
