@@ -55,7 +55,7 @@ def generate_latex_pdf(
     
     # Generate the PDF into a temporary file
     pdf_filename = "TCC_Stress_Verification_Report.pdf"
-    doc.generate_pdf(pdf_filename, clean_tex=False, silent=True)
+    doc.generate_pdf(pdf_filename, compiler='pdflatex', clean_tex=False, silent=True)
     
     # Read the PDF file as bytes
     with open(pdf_filename + ".pdf", "rb") as f:
