@@ -154,11 +154,10 @@ st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
 def generate_pdf():
-    # Create instance of FPDF class and add a page
     pdf = FPDF()
     pdf.add_page()
     
-    # Set title and font
+    # Title
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "TCC Element Stress Verification Report", ln=True, align="C")
     pdf.ln(10)
@@ -178,7 +177,7 @@ def generate_pdf():
     
     pdf.ln(8)
     
-    # Cross-Section (Plan) – as a schematic text description
+    # Cross-Section Plan (Text Description)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Cross-Section Plan", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -190,6 +189,20 @@ def generate_pdf():
             b_concrete, h_concrete, b_timber, h_timber, a_timber))
     
     pdf.ln(8)
+    
+    # Embed the SVG plan as a PNG image
+    # Ensure a file named "plan.svg" exists in your directory.
+    if os.path.exists("plan.svg"):
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
+            cairosvg.svg2png(url="plan.svg", write_to=tmp_file.name)
+            pdf.set_font("Arial", "B", 14)
+            pdf.cell(0, 10, "Cross-Section Plan (Image)", ln=True)
+            # Insert the image (adjust x, y, and w as needed)
+            current_y = pdf.get_y()
+            pdf.image(tmp_file.name, x=10, y=current_y, w=pdf.w - 20)
+        os.remove(tmp_file.name)
+    
+    pdf.ln(10)
     
     # Formulas Section
     pdf.set_font("Arial", "B", 14)
@@ -221,7 +234,7 @@ def generate_pdf():
     pdf.cell(0, 8, f"Maximum Shear Stress in Timber: {tau_timber_max/1e6:.2f} MPa", ln=True)
     pdf.cell(0, 8, f"Force in Connector: {F_connector/1e3:.2f} kN", ln=True)
     
-    # Use dest='S' to return the PDF as a string, then encode it to bytes.
+    # Generate the PDF as a string and encode it
     pdf_data = pdf.output(dest="S").encode("latin1")
     return pdf_data
 
@@ -235,4 +248,3 @@ if st.button("Generate PDF Report", key="generate_pdf_report"):
         mime="application/pdf",
         key="download_pdf_button"
     )
-
