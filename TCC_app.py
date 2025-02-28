@@ -30,7 +30,7 @@ b_concrete = st.sidebar.number_input("Width of Concrete Section (m)", value=0.4)
 
 # Connector and load parameters
 s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8)
-k_ser = st.sidebar.slider("Slip Modulus per connector (N/m)", min_value=100, max_value=2500000000, value=330000000, step=100, format=None, key=None, help="165000000 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
+k_ser = st.sidebar.slider("Slip Modulus per connector (N/m)", min_value=100, max_value=2500000000, value=330000000, step=1000, format=None, key=None, help="165000000 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 # k_ser = st.sidebar.number_input("Slip Modulus per connector (N/m)", value=330000000, format="%.2e")
 
 P = st.sidebar.number_input("Point Load (N)", value=80e3, format="%.2e")
@@ -127,3 +127,21 @@ sigma_m_concrete = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 # Calculate shear stress in Timber
 # Note: This formula is taken from your script, but verify it since it appears non-standard.
 tau_timber_max = (0.5 * E_timber * b_timber * h_timber**2) *V_max / (b_timber*EI_eff)
+
+st.title("TCC Element Stress Verification Results")
+
+st.markdown("## Timber")
+st.write(f"**Normal Stress in Timber:** {sigma_timber / 1e6:.2f} MPa")
+st.write(f"**Bending Stress in Timber:** {sigma_m_timber / 1e6:.2f} MPa")
+
+st.markdown("## Concrete")
+st.write(f"**Normal Stress in Concrete:** {sigma_concrete / 1e6:.2f} MPa")
+st.write(f"**Bending Stress in Concrete:** {sigma_m_concrete / 1e6:.2f} MPa")
+st.write(f"**Bending Moment in Concrete:** {M_concrete / 1e3:.2f} kNm")
+st.write(f"**Normal Force in Concrete:** {N_concrete / 1e3:.2f} kN")
+
+st.markdown("## Timber Shear")
+st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
+
+st.markdown("## Connectors")
+st.write(f"**Force in Connector:** {F_concrete / 1e3:.2f} kN")
