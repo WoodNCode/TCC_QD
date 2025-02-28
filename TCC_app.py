@@ -185,6 +185,32 @@ def generate_formula_image():
     buf.seek(0)
     return buf
 
+def generate_formula_image():
+    """
+    Create a Matplotlib figure that renders the formulas using mathtext,
+    then return a BytesIO buffer containing the PNG image.
+    """
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.axis("off")
+    
+    # Define the formulas using mathtext. Note that mathtext does not support 
+    # full LaTeX environments such as align, so we create a multi-line string.
+    formulas = (
+        r"$\gamma_1 = \frac{1}{1 + \frac{\pi^2\, E_{\mathrm{timber}}\, A_{\mathrm{timber}}\, s}{k_{\mathrm{ser}}\, L^2}}$" "\n\n" +
+        r"$a_2 = \frac{\gamma_1\, E_{\mathrm{concrete}}\, A_{\mathrm{concrete}}\, (h_{\mathrm{concrete}}+h_{\mathrm{timber}})}{2\Bigl(\gamma_1\, E_{\mathrm{concrete}}\, A_{\mathrm{concrete}}+E_{\mathrm{timber}}\, A_{\mathrm{timber}}\Bigr)}$" "\n\n" +
+        r"$a_1 = \frac{h_{\mathrm{timber}}}{2} - a_2 + \frac{h_{\mathrm{concrete}}}{2}$" "\n\n" +
+        r"$EI_{\mathrm{eff}} = E_{\mathrm{timber}}\, I_{\mathrm{timber}} + E_{\mathrm{concrete}}\, I_{\mathrm{concrete}} + E_{\mathrm{timber}}\, A_{\mathrm{timber}}\, a_1^2 + \gamma_1\, E_{\mathrm{concrete}}\, A_{\mathrm{concrete}}\, a_2^2$"
+    )
+    
+    # Place the formulas in the center of the figure.
+    ax.text(0.5, 0.5, formulas, ha="center", va="center", fontsize=12, wrap=True, transform=ax.transAxes)
+    
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
 def generate_pdf():
     pdf = FPDF()
     pdf.add_page()
@@ -194,7 +220,7 @@ def generate_pdf():
     pdf.cell(0, 10, "TCC Element Stress Verification Report", ln=True, align="C")
     pdf.ln(10)
     
-    # Input Parameters Section
+    # --- Input Parameters Section ---
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Input Parameters", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -208,7 +234,7 @@ def generate_pdf():
     pdf.cell(0, 8, f"Span Length (L): {L:.3f} m", ln=True)
     pdf.ln(8)
     
-    # Cross-Section Plan Description
+    # --- Cross-Section Plan Description ---
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Cross-Section Plan", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -220,7 +246,8 @@ def generate_pdf():
             b_concrete, h_concrete, b_timber, h_timber, a_timber))
     pdf.ln(8)
     
-    # --- Insert a Graphic: Cross-Section Plot ---
+    # --- Insert Cross-Section Graphic (Plot) ---
+    # Create the cross-section plot using Matplotlib.
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.fill_between([-b_concrete/2, b_concrete/2], 0, h_concrete, color="gray", alpha=0.7, label="Concrete Slab")
     ax.fill_between([-b_timber/2, b_timber/2], -h_timber, 0, color="saddlebrown", alpha=0.7, label="Timber Beam")
@@ -233,19 +260,21 @@ def generate_pdf():
     ax.legend()
     ax.grid(True)
     
+    # Save the plot temporarily.
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
         fig.savefig(tmp_file.name, format="png", bbox_inches="tight")
-        tmp_plot_filename = tmp_file.name
+        tmp_filename = tmp_file.name
     plt.close(fig)
     
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Cross-Section Graphic", ln=True)
     current_y = pdf.get_y()
-    pdf.image(tmp_plot_filename, x=10, y=current_y, w=pdf.w - 20)
-    os.remove(tmp_plot_filename)
+    pdf.image(tmp_filename, x=10, y=current_y, w=pdf.w - 20)
+    os.remove(tmp_filename)
     pdf.ln(10)
     
-    # --- Insert Formulas as LaTeX Graphic ---
+    # --- Insert Formulas Graphic ---
+    # Generate a graphic of the formulas.
     formula_buf = generate_formula_image()
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_formula:
         tmp_formula.write(formula_buf.getvalue())
@@ -257,7 +286,7 @@ def generate_pdf():
     os.remove(tmp_formula_filename)
     pdf.ln(10)
     
-    # Results Section
+    # --- Results Section ---
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Calculated Results", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -283,3 +312,4 @@ if st.button("Generate PDF Report", key="generate_pdf_report"):
         mime="application/pdf",
         key="download_pdf_button"
     )
+
