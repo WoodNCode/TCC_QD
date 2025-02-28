@@ -221,10 +221,9 @@ def generate_pdf():
     pdf.cell(0, 8, f"Maximum Shear Stress in Timber: {tau_timber_max/1e6:.2f} MPa", ln=True)
     pdf.cell(0, 8, f"Force in Connector: {F_connector/1e3:.2f} kN", ln=True)
     
-    # Save PDF to memory
-    pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
-    return pdf_output.getvalue()
+    # Use dest='S' to return the PDF as a string, then encode it to bytes.
+    pdf_data = pdf.output(dest="S").encode("latin1")
+    return pdf_data
 
 # --- Generate PDF Button ---
 if st.button("Generate PDF Report", key="generate_pdf_report"):
@@ -236,3 +235,4 @@ if st.button("Generate PDF Report", key="generate_pdf_report"):
         mime="application/pdf",
         key="download_pdf_button"
     )
+
