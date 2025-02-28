@@ -30,7 +30,7 @@ b_concrete = st.sidebar.number_input("Width of Concrete Section (m)", value=0.4)
 
 # Connector and load parameters
 s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8)
-k_ser = st.sidebar.slider("Slip Modulus per connector (N/m)", min_value=100, max_value=2500000000, value=330000000, step=100, format=None, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False, label_visibility="visible")
+k_ser = st.sidebar.slider("Slip Modulus per connector (N/m)", min_value=100, max_value=2500000000, value=330000000, step=100, format=None, key=None, help="165000000 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 # k_ser = st.sidebar.number_input("Slip Modulus per connector (N/m)", value=330000000, format="%.2e")
 
 P = st.sidebar.number_input("Point Load (N)", value=80e3, format="%.2e")
