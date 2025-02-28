@@ -157,36 +157,6 @@ st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
 def generate_formula_image():
     """
-    Create a Matplotlib figure that renders the formulas in LaTeX and return
-    a BytesIO buffer containing the PNG image.
-    """
-    # Create a figure without axes
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.axis("off")
-    
-    # Define the formulas using LaTeX
-    formulas = r"""
-    \begin{align*}
-    \gamma_1 &= \frac{1}{1 + \frac{\pi^2 \, E_{\text{timber}} \, A_{\text{timber}} \, s}{k_{\text{ser}} \, L^2}} \\[8pt]
-    a_2 &= \frac{\gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} \, (h_{\text{concrete}} + h_{\text{timber}})}
-           {2\Bigl(\gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} + E_{\text{timber}} \, A_{\text{timber}}\Bigr)} \\[8pt]
-    a_1 &= \frac{h_{\text{timber}}}{2} - a_2 + \frac{h_{\text{concrete}}}{2} \\[8pt]
-    EI_{\text{eff}} &= E_{\text{timber}} \, I_{\text{timber}} + E_{\text{concrete}} \, I_{\text{concrete}} + 
-           E_{\text{timber}} \, A_{\text{timber}} \, a_1^2 + \gamma_1 \, E_{\text{concrete}} \, A_{\text{concrete}} \, a_2^2
-    \end{align*}
-    """
-    # Display the formulas centered in the figure
-    ax.text(0.5, 0.5, formulas, horizontalalignment="center", verticalalignment="center",
-            fontsize=12, transform=ax.transAxes)
-    
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
-    plt.close(fig)
-    buf.seek(0)
-    return buf
-
-def generate_formula_image():
-    """
     Create a Matplotlib figure that renders the formulas using mathtext,
     then return a BytesIO buffer containing the PNG image.
     """
@@ -284,7 +254,7 @@ def generate_pdf():
     current_y = pdf.get_y()
     pdf.image(tmp_formula_filename, x=10, y=current_y, w=pdf.w - 20)
     os.remove(tmp_formula_filename)
-    pdf.ln(10)
+    pdf.ln(100)
     
     # --- Results Section ---
     pdf.set_font("Arial", "B", 14)
