@@ -152,7 +152,7 @@ st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
-if st.button("Generate LaTeX PDF Report"):
+if st.button("Generate LaTeX PDF Report", key="generate_pdf_report"):
     pdf_data = generate_latex_pdf(
         E_timber_g, E_concrete_g, h_timber, b_timber,
         h_concrete, b_concrete, s, k_ser, P, L,
@@ -163,6 +163,7 @@ if st.button("Generate LaTeX PDF Report"):
         label="Download LaTeX PDF Report",
         data=pdf_data,
         file_name="TCC_Stress_Verification_Report.pdf",
-        mime="application/pdf"
+        mime="application/pdf",
+        key="download_pdf_button"
     )
 
