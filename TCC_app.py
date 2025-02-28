@@ -156,12 +156,6 @@ st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 # --- Generate PDF Button ---
 if st.button("Generate PDF Report"):
     pdf_data = generate_pdf()
-    st.download_button(
-        label="Download PDF Report",
-        data=pdf_data,
-        file_name="TCC_Stress_Verification_Report.pdf",
-        mime="application/pdf"
-    )
 
 def generate_pdf():
     # Create instance of FPDF class and add a page
