@@ -3,4 +3,4 @@ matplotlib
 numpy
 fpdf
 cairosvg
-import tempfile
+tempfile
