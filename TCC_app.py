@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-from TCC_Report import generate_latex_pdf
+from TCC_report import generate_pdf_report
 
 st.title("TCC_QD EC5 Verification")
 
@@ -152,15 +152,15 @@ st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
-if st.button("Generate LaTeX PDF Report", key="generate_pdf_report"):
-    pdf_data = generate_latex_pdf(
+if st.button("Generate PDF Report", key="generate_pdf_report"):
+    pdf_data = generate_pdf_report(
         E_timber_g, E_concrete_g, h_timber, b_timber,
         h_concrete, b_concrete, s, k_ser, P, L,
         sigma_timber, sigma_m_timber, sigma_concrete, sigma_m_concrete,
         M_concrete, N_concrete, tau_timber_max, F_connector
     )
     st.download_button(
-        label="Download LaTeX PDF Report",
+        label="Download PDF Report",
         data=pdf_data,
         file_name="TCC_Stress_Verification_Report.pdf",
         mime="application/pdf",
