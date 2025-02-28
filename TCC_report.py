@@ -2,7 +2,7 @@ import os
 import io
 import tempfile
 from fpdf import FPDF
-from plots import create_formula_plot
+from TCC_plots import create_formula_plot
 
 def generate_pdf_report(
     E_timber_g, E_concrete_g, h_timber, b_timber,
