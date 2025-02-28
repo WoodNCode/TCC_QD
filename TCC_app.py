@@ -124,6 +124,9 @@ sigma_m_timber = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 sigma_concrete = (gamma_concrete * E_timber * a_timber * M_mid) / EI_eff
 sigma_m_concrete = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 
+N_concrete = sigma_concrete * A_concrete
+M_concrete = (E_concrete*I_concrete * M_mid) / EI_eff
+
 # Calculate shear stress in Timber
 # Note: This formula is taken from your script, but verify it since it appears non-standard.
 tau_timber_max = (0.5 * E_timber * b_timber * h_timber**2) *V_max / (b_timber*EI_eff)
