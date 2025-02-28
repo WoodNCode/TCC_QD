@@ -1,5 +1,6 @@
 from pylatex import Document, Section, Command, Math, Package
 from pylatex.utils import NoEscape
+import os
 
 def generate_latex_pdf(
     E_timber_g, E_concrete_g, h_timber, b_timber,
@@ -10,7 +11,7 @@ def generate_latex_pdf(
     # Create a new LaTeX document
     doc = Document(documentclass='article')
     
-    # Include packages for math and graphics
+    # Include necessary packages
     doc.packages.append(Package('amsmath'))
     doc.packages.append(Package('graphicx'))
     
@@ -52,6 +53,16 @@ def generate_latex_pdf(
         doc.append(f'Maximum Shear Stress in Timber: {tau_timber_max/1e6:.2f} MPa\\\\')
         doc.append(f'Force in Connector: {F_connector/1e3:.2f} kN\\\\')
     
-    # Compile the document into a PDF (returns bytes)
-    pdf_bytes = doc.dumps_pdf()
+    # Generate the PDF into a temporary file
+    pdf_filename = "TCC_Stress_Verification_Report.pdf"
+    doc.generate_pdf(pdf_filename, clean_tex=False, silent=True)
+    
+    # Read the PDF file as bytes
+    with open(pdf_filename + ".pdf", "rb") as f:
+        pdf_bytes = f.read()
+    
+    # Optionally, remove the generated files if you don't need them anymore
+    os.remove(pdf_filename + ".pdf")
+    os.remove(pdf_filename + ".tex")
+    
     return pdf_bytes
