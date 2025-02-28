@@ -154,8 +154,15 @@ st.markdown("## Connectors")
 st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
 # --- Generate PDF Button ---
-if st.button("Generate PDF Report"):
+if st.button("Generate PDF Report", key="generate_pdf_report"):
     pdf_data = generate_pdf()
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_data,
+        file_name="TCC_Stress_Verification_Report.pdf",
+        mime="application/pdf",
+        key="download_pdf_button"
+    )
 
 def generate_pdf():
     # Create instance of FPDF class and add a page
@@ -229,14 +236,4 @@ def generate_pdf():
     pdf_output = io.BytesIO()
     pdf.output(pdf_output)
     return pdf_output.getvalue()
-
-# --- Generate PDF Button ---
-if st.button("Generate PDF Report"):
-    pdf_data = generate_pdf()
-    st.download_button(
-        label="Download PDF Report",
-        data=pdf_data,
-        file_name="TCC_Stress_Verification_Report.pdf",
-        mime="application/pdf"
-    )
 
