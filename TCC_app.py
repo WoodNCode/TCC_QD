@@ -131,6 +131,9 @@ M_concrete = (E_concrete*I_concrete * M_mid) / EI_eff
 # Note: This formula is taken from your script, but verify it since it appears non-standard.
 tau_timber_max = (0.5 * E_timber * b_timber * h_timber**2) *V_max / (b_timber*EI_eff)
 
+# Calculate the Force in the Connector
+F_connector = (gamma_concrete*E_concrete*A_concrete*a_concrete*s) / (EI_eff) * V_max
+
 st.title("TCC Element Stress Verification Results")
 
 st.markdown("## Timber")
@@ -147,4 +150,4 @@ st.markdown("## Timber Shear")
 st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 
 st.markdown("## Connectors")
-st.write(f"**Force in Connector:** {F_concrete / 1e3:.2f} kN")
+st.write(f"**Force in Connector:** {F_cconnector / 1e3:.2f} kN")
