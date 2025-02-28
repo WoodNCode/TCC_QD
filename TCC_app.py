@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-from pdf_report import generate_latex_pdf
+from TCC_Report import generate_latex_pdf
 
 st.title("TCC_QD EC5 Verification")
 
