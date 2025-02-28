@@ -150,4 +150,4 @@ st.markdown("## Timber Shear")
 st.write(f"**Maximum Shear Stress in Timber:** {tau_timber_max / 1e6:.2f} MPa")
 
 st.markdown("## Connectors")
-st.write(f"**Force in Connector:** {F_cconnector / 1e3:.2f} kN")
+st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
