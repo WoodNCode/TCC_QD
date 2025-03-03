@@ -46,16 +46,16 @@ def generate_pdf_report(
     pdf.ln(8)
     
     # --- Insert Formula Graphic ---
-    formula_buf = create_formula_plot()
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
-        tmp_file.write(formula_buf.getvalue())
-        tmp_formula_filename = tmp_file.name
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Gamma Method Formulas", ln=True)
+    #formula_buf = create_formula_plot()
+    #with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
+    #    tmp_file.write(formula_buf.getvalue())
+    #    tmp_formula_filename = tmp_file.name
+    #pdf.set_font("Arial", "B", 14)
+    #pdf.cell(0, 10, "Gamma Method Formulas", ln=True)
     # Let FPDF auto-place the image (without specifying y)
-    pdf.image(tmp_formula_filename, x=10, w=pdf.w - 20)
-    os.remove(tmp_formula_filename)
-    pdf.ln(10)
+    #pdf.image(tmp_formula_filename, x=10, w=pdf.w - 20)
+    #os.remove(tmp_formula_filename)
+    #pdf.ln(10)
     
     # --- Results Section ---
     pdf.set_font("Arial", "B", 14)
