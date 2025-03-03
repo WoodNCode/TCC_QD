@@ -55,9 +55,9 @@ V_max = P*L/2
 gamma_concrete = 1 / (1 + (np.pi**2 * E_concrete * A_concrete * s) / (k_ser * L**2))
 
 # Compute neutral axis distances
-a_timber = (gamma_concrete * E_concrete * A_concrete * (h_concrete + h_timber)) / (2*(gamma_concrete * E_concrete * A_concrete) + (E_timber * A_timber))
+a_timber = (gamma_concrete * E_concrete * A_concrete * (h_concrete + h_timber)) / (2*((gamma_concrete * E_concrete * A_concrete) + (E_timber * A_timber)))
 a_timber_o = (gamma_concrete * E_concrete * A_concrete * (h_concrete + h_timber))
-a_timber_u = (2*(gamma_concrete * E_concrete * A_concrete) + (E_timber * A_timber))
+a_timber_u = (2*((gamma_concrete * E_concrete * A_concrete) + (E_timber * A_timber)))
 st.markdown(f"- **Neutral Axis Distances**: a_timber_o = {a_timber_o:.4f} m, a_timber_u = {a_timber_u:.4f} m")
 
 
