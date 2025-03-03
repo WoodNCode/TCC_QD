@@ -161,7 +161,7 @@ st.write(f"**Force in Connector:** {F_connector / 1e3:.2f} kN")
 
 if st.button("Generate PDF Report", key="generate_pdf_report"):
     pdf_data = generate_pdf_report(
-        E_timber_g, E_concrete_g, h_timber, b_timber,
+        E_timber_G, E_concrete_G, h_timber, b_timber,
         h_concrete, b_concrete, s, k_ser, P, L,
         sigma_timber, sigma_m_timber, sigma_concrete, sigma_m_concrete,
         M_concrete, N_concrete, tau_timber_max, F_connector
