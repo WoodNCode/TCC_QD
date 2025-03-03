@@ -15,14 +15,14 @@ Below, you can adjust the input parameters from the sidebar.
 # Sidebar input parameters
 st.sidebar.header("Input Parameters")
 
-E_timber_g = st.sidebar.number_input(
-    "Elastic Modulus of Timber (GPa)", value=11.0, format="%.1f", step=0.1
-)
-E_timber = E_timber_g*1000000000
-E_concrete_g = st.sidebar.number_input(
-    "Elastic Modulus of Concrete (GPa)", value=33.0, format="%.1f", step=0.1
-)
-E_concrete = E_concrete_g*1000000000
+E_timber_G = st.sidebar.number_input("Elastic Modulus of Timber (GPa)", value=11.0, format="%.1f", step=0.1)
+E_timber = E_timber_G*1000000000
+E_concrete_G = st.sidebar.number_input("Elastic Modulus of Concrete (GPa)", value=33.0, format="%.1f", step=0.1)
+E_concrete = E_concrete_G*1000000000
+f_m_timber_M = st.sidebar.number_input("Bending Strength in MPa", value=24, format="%.1f", step=0.1)
+f_m_timber = f_m_timber * 1000*1000
+f_t_timber_M = st.sidebar.number_input("Tensile Strength in MPa", value=14, format="%.1f", step=0.1)
+f_t_timber = f_t_timber * 1000*1000
 h_timber = st.sidebar.number_input("Height of Timber Section (m)", value=0.16)
 b_timber = st.sidebar.number_input("Width of Timber Section (m)", value=0.12)
 h_concrete = st.sidebar.number_input("Height of Concrete Section (m)", value=0.1)
@@ -123,6 +123,9 @@ st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
 sigma_timber = (E_timber * a_timber * M_mid) / EI_eff
 sigma_m_timber = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 
+utilisation_timber = sigma_m_timber/f_m_timber + sigma_timber / f_t_timber
+
+
 sigma_concrete = (gamma_concrete * E_timber * a_timber * M_mid) / EI_eff
 sigma_m_concrete = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 
@@ -141,6 +144,8 @@ st.title("TCC Element Stress Verification Results")
 st.markdown("## Timber")
 st.write(f"**Normal Stress in Timber:** {sigma_timber / 1e6:.2f} MPa")
 st.write(f"**Bending Stress in Timber:** {sigma_m_timber / 1e6:.2f} MPa")
+
+st.write(f"**Utilisation factor in Timber** {utilisation_timber.2f}")
 
 st.markdown("## Concrete")
 st.write(f"**Normal Stress in Concrete:** {sigma_concrete / 1e6:.2f} MPa")
