@@ -20,9 +20,9 @@ E_timber = E_timber_G*1000000000
 E_concrete_G = st.sidebar.number_input("Elastic Modulus of Concrete (GPa)", value=33.0, format="%.1f", step=0.1)
 E_concrete = E_concrete_G*1000000000
 f_m_timber_M = st.sidebar.number_input("Bending Strength in MPa", value=24.0, format="%.1f", step=0.1)
-f_m_timber = f_m_timber * 1000*1000
+f_m_timber = f_m_timber_M * 1000*1000
 f_t_timber_M = st.sidebar.number_input("Tensile Strength in MPa", value=14.0, format="%.1f", step=0.1)
-f_t_timber = f_t_timber * 1000*1000
+f_t_timber = f_t_timber_M * 1000*1000
 h_timber = st.sidebar.number_input("Height of Timber Section (m)", value=0.16)
 b_timber = st.sidebar.number_input("Width of Timber Section (m)", value=0.12)
 h_concrete = st.sidebar.number_input("Height of Concrete Section (m)", value=0.1)
