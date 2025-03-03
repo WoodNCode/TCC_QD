@@ -33,7 +33,7 @@ s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8)
 k_ser = st.sidebar.slider("Slip Modulus per connector (N/m)", min_value=100, max_value=2500000000, value=330000000, step=1000, format=None, key=None, help="165000000 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 # k_ser = st.sidebar.number_input("Slip Modulus per connector (N/m)", value=330000000, format="%.2e")
 
-P_kN = st.sidebar.number_input("Point Load (kN)", value=80e3, step=1, format="%.0f")
+P_kN = st.sidebar.number_input("Point Load (kN)", value=80e3, step=1, format="%.1f")
 P=P_kN*1000
 L = st.sidebar.number_input("Span Length (m)", value=1.6)
 
