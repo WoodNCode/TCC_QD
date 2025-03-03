@@ -145,7 +145,7 @@ st.markdown("## Timber")
 st.write(f"**Normal Stress in Timber:** {sigma_timber / 1e6:.2f} MPa")
 st.write(f"**Bending Stress in Timber:** {sigma_m_timber / 1e6:.2f} MPa")
 
-st.write(f"**Utilisation factor in Timber** {utilisation_timber.2f}")
+st.write(f"**Utilisation factor in Timber** {utilisation_timber}")
 
 st.markdown("## Concrete")
 st.write(f"**Normal Stress in Concrete:** {sigma_concrete / 1e6:.2f} MPa")
