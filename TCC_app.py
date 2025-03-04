@@ -139,7 +139,7 @@ M_concrete = (E_concrete*I_concrete * M_mid) / EI_eff
 
 # Calculate shear stress in Timber
 # Note: This formula is taken from your script, but verify it since it appears non-standard.
-tau_timber_max = (0.5 * E_timber * b_timber * h_timber**2) *V_max / (b_timber*EI_eff)
+tau_timber_max = (0.5 * E_timber * b_timber * (a_timber+h_timber*0.5)**2) *V_max / (b_timber*EI_eff)
 
 # Calculate the Force in the Connector
 F_connector = (gamma_concrete*E_concrete*A_concrete*a_concrete*s) / (EI_eff) * V_max
