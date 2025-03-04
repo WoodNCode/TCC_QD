@@ -49,7 +49,7 @@ I_concrete = (b_concrete * h_concrete**3) / 12
 
 # Calculate bending moment at mid-span
 M_mid = (P * L) / 4
-V_max = P*L/2
+V_max = P/2
 
 # Compute gamma factor
 gamma_concrete = 1 / (1 + (np.pi**2 * E_concrete * A_concrete * s) / (k_ser * L**2))
@@ -131,8 +131,8 @@ sigma_m_timber = (0.5 * E_timber * h_timber * M_mid) / EI_eff
 utilisation_timber = sigma_m_timber/f_m_timber + sigma_timber / f_t_timber
 
 
-sigma_concrete = (gamma_concrete * E_timber * a_timber * M_mid) / EI_eff
-sigma_m_concrete = (0.5 * E_timber * h_timber * M_mid) / EI_eff
+sigma_concrete = (gamma_concrete * E_concrete * a_concrete * M_mid) / EI_eff
+sigma_m_concrete = (0.5 * E_concrete * h_concrete * M_mid) / EI_eff
 
 N_concrete = sigma_concrete * A_concrete
 M_concrete = (E_concrete*I_concrete * M_mid) / EI_eff
