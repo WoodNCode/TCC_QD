@@ -141,7 +141,7 @@ M_concrete = (E_concrete*I_concrete * M_mid) / EI_eff
 # Note: This formula is taken from your script, but verify it since it appears non-standard.
 tau_timber_max = (0.5 * E_timber * b_timber * (a_timber+h_timber*0.5)**2) *V_max / (b_timber*EI_eff)
 h_EC_tau = (a_timber+h_timber*0.5)
-st.write(f"**h according to EC5 A2 B.4:** {h_EC_tau/1000:.2f} m")
+st.write(f"**h according to EC5 A2 B.4:** {h_EC_tau*1000:.2f} mm")
 
 # Calculate the Force in the Connector
 F_connector = (gamma_concrete*E_concrete*A_concrete*a_concrete*s) / (EI_eff) * V_max
