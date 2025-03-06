@@ -4,3 +4,4 @@ numpy
 fpdf
 cairosvg
 pylatex
+openseespy
