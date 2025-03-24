@@ -1,7 +1,7 @@
 import os
 import io
 import tempfile
-%from fpdf import FPDF
+# from fpdf import FPDF
 from TCC_plots import create_formula_plot
 
 def generate_pdf_report(
