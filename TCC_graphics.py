@@ -1,4 +1,5 @@
 import drawsvg as draw
+import base64
 
 def render_svg(svg):
     """Renders the given svg string."""
