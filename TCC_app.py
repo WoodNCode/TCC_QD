@@ -91,10 +91,11 @@ plt.title("Cross-section of TCC Element")
 plt.legend()
 plt.grid()
 # st.pyplot(plt)
+
 ########## Graphiocs
-# Generate the SVG strings:
-svg_elevation = draw_elevation_view(L, s)
-svg_cross_section = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
+# Generate the SVG strings
+svg_elev = draw_elevation_view(L, s)
+svg_xsec = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
 
 st.title("TCC Element Illustrations")
 
