@@ -97,8 +97,8 @@ svg_elevation = draw_elevation_view(L, s)
 svg_cross_section = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
 
 # Display in your app:
-components.html(svg_elevation, height=500)
-components.html(svg_cross_section, height=1200)
+components.html(svg_elevation, height=600)
+components.html(svg_cross_section, height=600)
 
 # --- Effective Bending Stiffness ---
 EI_eff = (E_timber * I_timber + 
