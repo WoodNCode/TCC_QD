@@ -99,7 +99,7 @@ def draw_elevation_view(L, s, show_legend=False):
         # etc. You can add arrow/connectors similarly
 
     return d.as_svg()
-    
+
 def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None, show_legend=False):
     """
     Returns an SVG string for the Cross-section view of a TCC element,
