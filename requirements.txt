@@ -5,4 +5,4 @@ fpdf
 cairosvg
 pylatex
 openseespy
-svgwrite
+drawsvg
