@@ -91,6 +91,12 @@ plt.legend()
 plt.grid()
 # st.pyplot(plt)
 
+# --- Effective Bending Stiffness ---
+EI_eff = (E_timber * I_timber + 
+          E_concrete * I_concrete + 
+          E_timber * A_timber * a_timber**2 + 
+          gamma_concrete * E_concrete * A_concrete * a_concrete**2)
+
 ########## Graphics
 # Generate the SVG strings.
 svg_elev = draw_elevation_view(L, s)
