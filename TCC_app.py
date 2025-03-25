@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from TCC_report import generate_pdf_report
 import TCC_graphics
+import streamlit.components.v1 as components
 
 st.title("TCC_QD EC5 Verification")
 
@@ -75,7 +76,7 @@ plt.ylabel("Elevation")
 plt.title("Elevation View of TCC Element")
 plt.legend()
 plt.grid()
-st.pyplot(plt)
+# st.pyplot(plt)
 
 # Cross-section plot
 plt.figure(figsize=(8, 6))
@@ -89,7 +90,15 @@ plt.ylabel("Height (m)")
 plt.title("Cross-section of TCC Element")
 plt.legend()
 plt.grid()
-st.pyplot(plt)
+# st.pyplot(plt)
+
+# Generate the SVG strings:
+svg_elevation = draw_elevation_view(L, s)
+svg_cross_section = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
+
+# Display in your app:
+components.html(svg_elevation, height=150)
+components.html(svg_cross_section, height=400)
 
 # --- Effective Bending Stiffness ---
 EI_eff = (E_timber * I_timber + 
