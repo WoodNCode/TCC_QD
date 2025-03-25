@@ -1,154 +1,159 @@
-import math
-
 import drawsvg as draw
 
 def draw_elevation_view(L, s):
     """
-    Returns an SVG string for the elevation view of a TCC element.
-    Model coordinates:
-      • The beam runs from x=0 to x=L at y=0.
-      • Supports (upward-pointing triangles) are drawn at the beam ends.
-      • Connectors (red circles) are spaced along the beam.
-      • A downward-pointing load arrow is drawn from (L/2,5) to (L/2,0).
+    Returns an SVG string for the elevation view of a TCC element, drawn 'right-side up'
+    and scaled larger for visibility.
+    
+    Parameters:
+      L (float): Beam length in "model units" (e.g., meters).
+      s (float): Connector spacing (same units as L).
     """
-    # Define drawing parameters (model in meters/units)
-    margin = 20              # extra space around the drawing
-    # Define model vertical extents: let’s show from y = -10 to y = +10.
-    model_y_min = -10
-    model_y_max = 10
+    # 1) Define the canvas size and margins so things aren't cramped.
+    margin = 50
+    canvas_height = 250
     canvas_width = L + 2 * margin
-    canvas_height = (model_y_max - model_y_min) + 2 * margin  # (20 + 40 = 60)
-    
-    # We want our model's y=0 (beam level) to be raised by (margin - model_y_min)
-    y_offset = margin - model_y_min  # =20 - (-10) = 30
-    
-    # Create drawing with origin at bottom left (no flip!)
-    d = draw.Drawing(canvas_width, canvas_height, origin=(0,0))
-    
-    # Draw the beam: a horizontal line from (margin, y_offset) to (margin+L, y_offset)
-    d.append(draw.Line(margin, y_offset, margin + L, y_offset,
-                       stroke='black', stroke_width=2))
-    
-    # Helper: draw an upward-pointing support triangle centered at (x, y).
-    # Here we design an isosceles triangle whose centroid is (x,0).
-    # We'll choose vertices so that the triangle’s tip is at (x, 2/3*size)
-    # and the base vertices at (x - size, -1/3*size) and (x + size, -1/3*size).
-    def support_triangle(x, y, size):
+
+    # 2) Create the drawing with origin at (0,0). We'll place the beam around y=100.
+    d = draw.Drawing(canvas_width, canvas_height, origin=(0,0), displayInline=False)
+
+    # 3) Increase the rendered size so it appears bigger.
+    #    (You can tweak this scale factor as needed.)
+    d.set_pixel_scale(2)
+
+    # We'll place the beam at y=100, from x=margin to x=margin+L
+    beam_y = 100
+
+    # Draw the beam (a horizontal line)
+    d.append(draw.Line(margin, beam_y, margin + L, beam_y,
+                       stroke='black', stroke_width=3))
+
+    # Upward-pointing support triangles at beam ends
+    def support_triangle(cx, cy, size):
+        """
+        An upward triangle with centroid near (cx,cy).
+        Tip is above (cx,cy); base is below.
+        """
         return draw.Lines(
-            x, y + (2/3)*size,
-            x - size, y - (1/3)*size,
-            x + size, y - (1/3)*size,
+            cx,     cy + 2*size/3,    # tip (top)
+            cx - size, cy - size/3,   # left base
+            cx + size, cy - size/3,   # right base
             close=True,
             fill='black'
         )
-    
-    support_size = 6
-    # Draw supports at the left and right ends of the beam.
-    d.append(support_triangle(margin, y_offset, support_size))
-    d.append(support_triangle(margin + L, y_offset, support_size))
-    
-    # Draw connectors as red circles along the beam.
-    n_connectors = int(L / s)
-    for i in range(n_connectors):
-        x = margin + s/2 + i * s
-        d.append(draw.Circle(x, y_offset, 2.5, fill='red'))
-    
-    # Create a downward-pointing arrow marker.
-    # For a downward arrow (in our upward-positive system), we want the marker’s tip at (0,0).
-    # We define a marker with a bounding box and a simple triangular shape.
-    arrow = draw.Marker(-0.5, -1, 0.5, 0, scale=3, orient='auto', id='load_arrow')
-    # The arrow shape: vertices at (0,0) (the tip), (0.4,-0.8) and (-0.4,-0.8).
-    arrow.append(draw.Lines(0, 0, 0.4, -0.8, -0.4, -0.8, close=True, fill='blue'))
-    d.append(arrow)
-    
-    # Draw the load: a vertical line from (L/2, y_offset+5) down to (L/2, y_offset)
-    load_x = margin + L/2
-    load_line = draw.Line(load_x, y_offset + 5, load_x, y_offset,
-                          stroke='blue', stroke_width=2,
-                          marker_end=arrow)
-    d.append(load_line)
-    
-    # Add title and axis labels (positions chosen for clarity)
-    d.append(draw.Text("Elevation View of TCC Element", 10, margin, canvas_height - margin + 5))
-    d.append(draw.Text("Beam Length (m)", 10, canvas_width/2 - 30, 5))
-    d.append(draw.Text("Elevation", 10, 5, canvas_height/2,
-                       transform=f"rotate(-90,5,{canvas_height/2})"))
-    
-    # Optionally, gridlines can be added (commented out for now)
-    # for y in range(int(model_y_min), int(model_y_max)+1, 5):
-    #     d.append(draw.Line(margin, y + (margin - model_y_min),
-    #                        margin + L, y + (margin - model_y_min),
-    #                        stroke='lightgray', stroke_width=0.5))
-    # for x in range(margin, int(margin+L)+1, 10):
-    #     d.append(draw.Line(x, margin, x, canvas_height - margin,
-    #                        stroke='lightgray', stroke_width=0.5))
-    
-    return d.as_svg()
 
+    support_size = 8
+    d.append(support_triangle(margin,     beam_y, support_size))
+    d.append(support_triangle(margin + L, beam_y, support_size))
+
+    # Connectors (red circles) spaced along the beam
+    n_connectors = int(L // s)
+    for i in range(n_connectors):
+        x_pos = margin + s/2 + i*s
+        d.append(draw.Circle(x_pos, beam_y, 4, fill='red'))
+
+    # Draw the downward load arrow in BLUE.
+    # We'll create a marker for the arrow tip.
+    arrow_marker = draw.Marker(-0.5, -1, 0.5, 0, scale=4, orient='auto', id='down_arrow')
+    # A simple triangular arrow shape with tip at (0,0) and base around (±0.4, -0.8).
+    arrow_marker.append(draw.Lines(0,0, 0.4,-0.8, -0.4,-0.8, close=True, fill='blue'))
+    d.append(arrow_marker)
+
+    # Vertical line for the load from y=beam_y+30 down to y=beam_y
+    load_x = margin + L/2
+    load_line = draw.Line(load_x, beam_y + 30, load_x, beam_y,
+                          stroke='blue', stroke_width=3,
+                          marker_end=arrow_marker)
+    d.append(load_line)
+
+    # Some text
+    d.append(draw.Text("Elevation View of TCC Element", 14,
+                       margin, canvas_height - 20,
+                       fill='black'))
+    d.append(draw.Text("Beam Length (m)", 12,
+                       canvas_width/2 - 40, 30,
+                       fill='black'))
+    # Rotate the Y-axis label 90° around its anchor
+    d.append(draw.Text("Elevation", 12,
+                       20, canvas_height/2,
+                       fill='black',
+                       transform=f"rotate(-90,20,{canvas_height/2})"))
+
+    # (No grid lines, as requested — if you want them, add them later.)
+
+    return d.as_svg()
 def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None):
     """
     Returns an SVG string for the cross-section view of a TCC element.
-    Model coordinates (y increases upward):
-      • Concrete slab: x from -b_concrete/2 to b_concrete/2, y from 0 to h_concrete.
-      • Timber beam: x from -b_timber/2 to b_timber/2, y from -h_timber to 0.
-      • Connector: red circle at (0,0).
-      • Neutral axis (if a_timber is provided): horizontal line at y = -h_timber/2 + a_timber.
+    
+    Model coordinates:
+      - Concrete slab from x in [-b_concrete/2, b_concrete/2], y in [0, h_concrete].
+      - Timber beam from x in [-b_timber/2, b_timber/2], y in [-h_timber, 0].
+      - A connector (red circle) at (0, 0).
+      - Neutral axis (if a_timber) at y = -h_timber/2 + a_timber.
     """
-    margin = 30
-    # Define model extents.
-    model_x_min = -b_concrete/2
-    model_x_max = b_concrete/2
-    model_y_min = -h_timber
-    model_y_max = h_concrete
-    canvas_width = (model_x_max - model_x_min) + 2*margin
-    canvas_height = (model_y_max - model_y_min) + 2*margin
-    
-    # Create drawing with origin at bottom left.
-    d = draw.Drawing(canvas_width, canvas_height, origin=(0,0))
-    # Offset for model coordinates so that (0,0) is shifted by (margin - model_x_min, margin - model_y_min)
-    offset_x = margin - model_x_min
-    offset_y = margin - model_y_min
-    
-    # Draw the concrete slab as a rectangle: lower left at (-b_concrete/2, 0).
-    d.append(draw.Rectangle(offset_x - b_concrete/2, offset_y + 0, b_concrete, h_concrete,
+    # 1) Canvas size and margins
+    margin = 50
+    canvas_width = b_concrete + 2*margin
+    canvas_height = h_concrete + h_timber + 2*margin
+
+    d = draw.Drawing(canvas_width, canvas_height, origin=(0,0), displayInline=False)
+    d.set_pixel_scale(2)  # Make the rendering bigger
+
+    # 2) We want the "interface" (y=0) somewhere in the middle. We'll define an offset:
+    #    offset_x = margin - ( -b_concrete/2 ) = margin + b_concrete/2
+    #    offset_y = margin - ( -h_timber ) = margin + h_timber
+    offset_x = margin + b_concrete/2
+    offset_y = margin + h_timber
+
+    # Draw the concrete slab
+    #  bottom-left at ( -b_concrete/2, 0 )
+    #  top-right   at ( +b_concrete/2, h_concrete )
+    # in the final drawing, that means:
+    slab_x = offset_x - b_concrete/2
+    slab_y = offset_y + 0
+    d.append(draw.Rectangle(slab_x, slab_y,
+                            b_concrete, h_concrete,
                             fill='gray', fill_opacity=0.7))
-    
-    # Draw the timber beam: rectangle from (-b_timber/2, -h_timber) with height h_timber.
-    d.append(draw.Rectangle(offset_x - b_timber/2, offset_y - h_timber, b_timber, h_timber,
+
+    # Draw the timber beam
+    #  bottom-left at ( -b_timber/2, -h_timber )
+    #  top-right   at ( +b_timber/2, 0 )
+    beam_x = offset_x - b_timber/2
+    beam_y = offset_y - h_timber
+    d.append(draw.Rectangle(beam_x, beam_y,
+                            b_timber, h_timber,
                             fill='saddlebrown', fill_opacity=0.7))
-    
-    # Draw a connector: red circle at (0,0)
-    d.append(draw.Circle(offset_x + 0, offset_y + 0, 3, fill='red'))
-    
-    # Draw a dashed line at the interface y = 0.
-    d.append(draw.Line(offset_x - b_concrete/2, offset_y + 0,
-                       offset_x + b_concrete/2, offset_y + 0,
-                       stroke='black', stroke_width=1, stroke_dasharray="4,2"))
-    
-    # Draw the neutral axis if provided.
+
+    # Connector at (0,0)
+    d.append(draw.Circle(offset_x + 0, offset_y + 0, 5, fill='red'))
+
+    # Dashed line at y=0
+    d.append(draw.Line(offset_x - b_concrete/2, offset_y,
+                       offset_x + b_concrete/2, offset_y,
+                       stroke='black', stroke_width=2,
+                       stroke_dasharray="5,5"))
+
+    # Neutral axis if provided
     if a_timber is not None:
         na_y = -h_timber/2 + a_timber
         d.append(draw.Line(offset_x - b_concrete/2, offset_y + na_y,
                            offset_x + b_concrete/2, offset_y + na_y,
-                           stroke='blue', stroke_width=2))
-    
-    # Add title and axis labels.
-    d.append(draw.Text("Cross-section of TCC Element", 12,
-                       offset_x - b_concrete/2, offset_y + h_concrete + 15))
+                           stroke='blue', stroke_width=3))
+
+    # Some text
+    d.append(draw.Text("Cross-section of TCC Element", 14,
+                       slab_x, slab_y + h_concrete + 30,
+                       fill='black'))
     d.append(draw.Text("Width (m)", 12,
-                       canvas_width/2 - 30, offset_y - 15))
+                       canvas_width/2 - 40, margin - 20,
+                       fill='black'))
     d.append(draw.Text("Height (m)", 12,
-                       offset_x - b_concrete/2 - 20, canvas_height/2,
-                       transform=f"rotate(-90,{offset_x - b_concrete/2 - 20},{canvas_height/2})"))
-    
-    # Optionally, gridlines can be added (commented out for now)
-    # for x in range(int(model_x_min), int(model_x_max)+1, 10):
-    #     d.append(draw.Line(offset_x + x, offset_y + model_y_min,
-    #                        offset_x + x, offset_y + model_y_max,
-    #                        stroke='lightgray', stroke_width=0.5))
-    # for y in range(int(model_y_min), int(model_y_max)+1, 5):
-    #     d.append(draw.Line(offset_x + model_x_min, offset_y + y,
-    #                        offset_x + model_x_max, offset_y + y,
-    #                        stroke='lightgray', stroke_width=0.5))
-    
+                       slab_x - 40, (beam_y + h_concrete)/2,
+                       fill='black',
+                       transform=f"rotate(-90,{slab_x - 40},{(beam_y + h_concrete)/2})"))
+
+    # No grid lines (commented out)
+    # ...
+
     return d.as_svg()
