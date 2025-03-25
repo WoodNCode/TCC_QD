@@ -26,7 +26,7 @@ def draw_elevation_view(L, s):
     canvas_height = 300            # fixed canvas height
     beam_y = 100                   # y-coordinate for the beam
     beam_left = margin             # beam starts at x = margin
-    beam_right = beam_left + L*100     
+    beam_right = beam_left + L*1000     
     
     d = draw.Drawing(canvas_width, canvas_height, origin=(0,0), displayInline=False)
     
