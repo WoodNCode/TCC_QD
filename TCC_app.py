@@ -62,7 +62,6 @@ a_timber_o = (gamma_concrete * E_concrete * A_concrete * (h_concrete + h_timber)
 a_timber_u = (2*((gamma_concrete * E_concrete * A_concrete) + (E_timber * A_timber)))
 st.markdown(f"- **Neutral Axis Distances**: a_timber_o = {a_timber_o:.4f} m, a_timber_u = {a_timber_u:.4f} m")
 
-
 a_concrete = (h_timber / 2) - a_timber + (h_concrete / 2)
 
 # Elevation view
@@ -93,7 +92,6 @@ plt.grid()
 # st.pyplot(plt)
 
 ########## Graphics
-
 # Generate the SVG strings.
 svg_elev = draw_elevation_view(L, s)
 svg_xsec = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
@@ -109,9 +107,8 @@ st.download_button("Download Elevation SVG", data=svg_elev, file_name="elevation
 st.header("Cross-section View")
 components.html(svg_xsec, height=400)
 st.download_button("Download Cross-section SVG", data=svg_xsec, file_name="cross_section.svg", mime="image/svg+xml")
-
-
 ########
+
 # Deflection curve computation
 x_left = np.linspace(0, L/2, 50)
 x_right = np.linspace(L/2, L, 50)
