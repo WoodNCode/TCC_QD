@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from TCC_report import generate_pdf_report
+import TCC_graphics
 
 st.title("TCC_QD EC5 Verification")
 
