@@ -92,31 +92,26 @@ plt.legend()
 plt.grid()
 # st.pyplot(plt)
 
-########## Graphiocs
-# Generate the SVG strings
+########## Graphics
+
+# Generate the SVG strings.
 svg_elev = draw_elevation_view(L, s)
 svg_xsec = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
 
 st.title("TCC Element Illustrations")
 
-st.subheader("Elevation View")
-# Show the elevation SVG
-components.html(svg_elev, height=300)
-# Provide a download button
-st.download_button("Download Elevation SVG",
-                   data=svg_elev,
-                   file_name="elevation_view.svg",
-                   mime="image/svg+xml")
+st.header("Elevation View")
+# Use components.html so each SVG gets its own space.
+components.html(svg_elev, height=350)
+# Provide a download button for the elevation view.
+st.download_button("Download Elevation SVG", data=svg_elev, file_name="elevation_view.svg", mime="image/svg+xml")
 
-st.subheader("Cross-section View")
-# Show the cross-section SVG
+st.header("Cross-section View")
 components.html(svg_xsec, height=400)
-# Provide a download button
-st.download_button("Download Cross-section SVG",
-                   data=svg_xsec,
-                   file_name="cross_section.svg",
-                   mime="image/svg+xml")
+st.download_button("Download Cross-section SVG", data=svg_xsec, file_name="cross_section.svg", mime="image/svg+xml")
 
+
+########
 # Deflection curve computation
 x_left = np.linspace(0, L/2, 50)
 x_right = np.linspace(L/2, L, 50)
