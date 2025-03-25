@@ -1,5 +1,6 @@
 import drawsvg as draw
 import base64 as base64
+import streamlit.st
 
 def render_svg(svg):
     """Renders the given svg string."""
