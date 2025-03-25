@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from TCC_report import generate_pdf_report
-from TCC_graphics import draw_elevation_view, draw_cross_section
+from TCC_graphics import draw_elevation_view, draw_cross_section, render_svg
 import streamlit.components.v1 as components
 
 st.title("TCC_QD EC5 Verification")
@@ -102,7 +102,7 @@ st.title("TCC Element Illustrations")
 
 st.header("Elevation View")
 # Use components.html so each SVG gets its own space.
-components.html(svg_elev, height=350)
+render_svg(svg_elev)
 # Provide a download button for the elevation view.
 st.download_button("Download Elevation SVG", data=svg_elev, file_name="elevation_view.svg", mime="image/svg+xml")
 
