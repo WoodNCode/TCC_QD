@@ -1,5 +1,6 @@
 import io
 import matplotlib.pyplot as plt
+import numpy as np
 
 def create_formula_plot():
     """
@@ -29,3 +30,86 @@ def create_formula_plot():
     plt.close(fig)
     buf.seek(0)
     return buf
+
+
+def plot_elevation_view(L, s, P, show_plot=True):
+    """
+    Plots the elevation view of the TCC element with:
+      - Beam line from x=0 to x=L
+      - A point load at mid-span
+      - Two supports at ends
+      - Connectors spaced at 's'
+    If show_plot=True, will call plt.show() at the end (useful if needed).
+    """
+    fig, ax = plt.subplots(figsize=(8, 2))
+    ax.plot([0, L], [0, 0], linewidth=2, label='Beam')
+    ax.scatter([L/2], [0], s=100, label='Point Load')
+    ax.scatter([0, L], [0, 0], marker='^', s=100, label='Supports')
+
+    # Plot the connector positions
+    n_connectors = int(L / s)
+    connector_positions = np.linspace(s/2, L - s/2, n_connectors)
+    ax.scatter(connector_positions, np.zeros(n_connectors), color='red', label='Connectors')
+
+    ax.set_xlabel("Beam Length (m)")
+    ax.set_ylabel("Elevation")
+    ax.set_title("Elevation View of TCC Element")
+    ax.legend()
+    ax.grid()
+
+    if show_plot:
+        plt.show()
+
+    return fig
+
+def plot_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber, show_plot=True):
+    """
+    Plots a cross-section with:
+      - Concrete slab
+      - Timber beam
+      - Approx. connector location
+      - Neutral axis drawn
+    """
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.fill_between([-b_concrete/2, b_concrete/2], 0, h_concrete, alpha=0.7, label='Concrete Slab')
+    ax.fill_between([-b_timber/2, b_timber/2], -h_timber, 0, alpha=0.7, label='Timber Beam')
+    
+    # Connectors at the interface
+    ax.scatter([0], [0], color='red', label='Connectors')
+    ax.axhline(0, linestyle='--', linewidth=0.8, color='black')
+    
+    # Plot the NA in timber
+    na_position = -h_timber/2 + a_timber
+    ax.axhline(na_position, linestyle='-', linewidth=2, color='blue', label='Neutral Axis')
+
+    ax.set_xlabel("Width (m)")
+    ax.set_ylabel("Height (m)")
+    ax.set_title("Cross-Section of TCC Element")
+    ax.legend()
+    ax.grid()
+
+    if show_plot:
+        plt.show()
+    
+    return fig
+
+def plot_deflection_shape(x_left, delta_left, x_right, delta_right, show_plot=True):
+    """
+    Plots the beam deflection (in mm) vs x (in m).
+    """
+    fig, ax = plt.subplots(figsize=(8, 4))
+    # Concatenate arrays for a single curve if desired, or keep them separate
+    ax.plot(x_left, delta_left*1e3, label='Deflection (left half) in mm')
+    ax.plot(x_right, delta_right*1e3, label='Deflection (right half) in mm')
+
+    ax.axhline(0, color='black', linestyle='--', linewidth=0.8)
+    ax.set_xlabel("Beam Length (m)")
+    ax.set_ylabel("Deflection (mm)")
+    ax.set_title("Deflection of TCC Element (Gamma Method)")
+    ax.legend()
+    ax.grid()
+
+    if show_plot:
+        plt.show()
+    
+    return fig
