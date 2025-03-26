@@ -99,8 +99,8 @@ EI_eff = (E_timber * I_timber +
 
 ########## Graphics
 # Generate the SVG strings.
-svg_elev = draw_elevation_view(L, s)
-svg_xsec = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
+svg_elev = draw_elevation_view_scaled(L, s)
+svg_xsec = draw_cross_section_scaled(b_concrete, h_concrete, b_timber, h_timber, a_timber)
 
 st.title("TCC Element Illustrations")
 
