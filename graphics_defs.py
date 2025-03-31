@@ -105,6 +105,6 @@ def add_vertical_dimension_line(drawing, x, y1, y2, offset, text_value, tick_len
     mid_x = x + offset + tick_length + 2  # Slightly to the right of the ticks.
     mid_y = (y1 + y2) / 2
     # Rotate the text so it reads vertically.
-    dim_text = draw.Text(text_value, 12, mid_x, mid_y, text_anchor="start",
+    dim_text = draw.Text(text_value, 12, mid_x, mid_y, text_anchor="middle",
                          transform="rotate(90, {}, {})".format(mid_x, mid_y))
     drawing.append(dim_text)
