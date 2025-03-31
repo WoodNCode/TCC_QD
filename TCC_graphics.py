@@ -1,7 +1,7 @@
 import drawsvg as draw
 import math
 import streamlit as st
-from graphics_defs import get_timber_pattern, get_concrete_hatch, add_horizontal_dimension_line, add_vertical_dimension_line
+from graphics_defs import get_timber_pattern, get_concrete_hatch, add_horizontal_dimension_line, add_vertical_dimension_line,  add_legend
 
 def render_svg(svg):
     """Renders the given svg string."""
@@ -156,12 +156,21 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
     concrete_element.append_title("Betonplatte")
     d.append(concrete_element)
 
+    if a_timber:
+        neutral_y = h_timber/2*1000-a_timber*1000
+        neutral_line = draw.Line(-100, neutral_y, 100, neutral_y, 
+                           stroke='red', stroke_width=1, stroke_dasharray="5,2,1,2")
+        d.append(neutral_line)
+        neutral_label = draw.Text("Neutralachse", 12, 0, neutral_y - 5,
+                              text_anchor="middle", fill="red")
+        d.append(neutral_label)
+
     # Add dimension lines.
     add_horizontal_dimension_line(d, -b_concrete/2*1000, -h_concrete*1000, b_concrete/2*1000, -20, f"{b_concrete * 1000:.0f} mm")
     add_horizontal_dimension_line(d, -b_timber/2*1000, h_timber*1000, b_timber/2*1000, 20, f"{b_timber * 1000:.0f} mm")
     add_vertical_dimension_line(d, -b_timber/2*1000, -0, h_timber*1000, -20, f"{h_timber * 1000:.0f} mm")
     add_vertical_dimension_line(d, -b_concrete/2*1000, -h_concrete*1000, 0, -20, f"{h_concrete * 1000:.0f} mm")
-
-    d  # Display as SVG    
+    
+    add_legend(d)   
 
     return d.as_svg()

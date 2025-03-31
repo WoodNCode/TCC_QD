@@ -108,3 +108,37 @@ def add_vertical_dimension_line(drawing, x, y1, y2, offset, text_value, tick_len
     dim_text = draw.Text(text_value, 12, mid_x, mid_y, text_anchor="middle",
                          transform="rotate(90, {}, {})".format(mid_x, mid_y))
     drawing.append(dim_text)
+
+def add_legend(drawing):
+    """
+    Adds a legend to the drawing. The legend includes a background box,
+    a title, and legend items for the timber element and the concrete element.
+    """
+    # Create a group to hold all legend elements.
+    legend = draw.Group(id="legend")
+    
+    # Define the legend background (position and size may be adjusted).
+    # Here it is placed at (-245, 85) with width 100 and height 85.
+    legend_bg = draw.Rectangle(-245, 85, 100, 85, fill='white', stroke='black', stroke_width=1)
+    legend.append(legend_bg)
+    
+    # Add a legend title.
+    legend_title = draw.Text("Legende", 14, -240, 100, text_anchor="start")
+    legend.append(legend_title)
+    
+    # Legend item 1: Timber element ("Holzbalken")
+    # A small rectangle filled with the timber pattern.
+    timber_icon = draw.Rectangle(-240, 140, 20, 20, fill='url(#timber_lines)', stroke='black', stroke_width=1)
+    legend.append(timber_icon)
+    timber_text = draw.Text("Holzbalken", 12, -215, 155, text_anchor="start")
+    legend.append(timber_text)
+    
+    # Legend item 2: Concrete element ("Betonplatte")
+    # A small rectangle filled with the concrete hatch pattern.
+    concrete_icon = draw.Rectangle(-240, 110, 20, 20, fill='url(#concrete_hatch)', stroke='black', stroke_width=1)
+    legend.append(concrete_icon)
+    concrete_text = draw.Text("Betonplatte", 12, -215, 125, text_anchor="start")
+    legend.append(concrete_text)
+    
+    # Append the legend group to the main drawing.
+    drawing.append(legend)

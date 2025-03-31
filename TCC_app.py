@@ -101,12 +101,15 @@ results = compute_stresses_and_forces(
 fig_elevation = plot_elevation_view(L, s, P)
 st.pyplot(fig_elevation)
 
-# Cross-section plot
-fig_cross_sec = plot_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
-st.pyplot(fig_cross_sec)
 # Cross Section SVG from external Module
 d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
 st.components.v1.html(d, width=800, height=500)
+st.download_button(
+    label="Download SVG",
+    data=d,
+    file_name="drawing.svg",
+    mime="image/svg+xml"
+)
 
 # Deflection shape plot
 fig_deflection = plot_deflection_shape(x_left, delta_left, x_right, delta_right)
