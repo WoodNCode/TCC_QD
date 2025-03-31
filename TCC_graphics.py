@@ -158,4 +158,4 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
 
     d  # Display as SVG    
 
-        return d.as_svg()
+    return d.as_svg()
