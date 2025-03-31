@@ -1,7 +1,7 @@
 import drawsvg as draw
 import math
 import streamlit as st
-import base64 as base64
+from graphics_defs import get_timber_pattern, get_concrete_hatch
 
 def render_svg(svg):
     """Renders the given svg string."""
@@ -133,105 +133,29 @@ def draw_elevation_view_scaled(L, s):
 
     return d.as_svg()
 
-def draw_cross_section_scaled(b_concrete, h_concrete, b_timber, h_timber, a_timber=None):
-    """
-    Returns an SVG string for the Cross-section view of a TCC element,
-    automatically scaled to ~800×400 px.
+def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None):
 
-    Model geometry:
-      - Concrete slab: x in [-b_concrete/2, +b_concrete/2], y in [0, h_concrete]
-      - Timber beam:   x in [-b_timber/2,   +b_timber/2],   y in [-h_timber, 0]
-      - Connector at (0,0)
-      - Dashed line at y=0
-      - If a_timber: neutral axis at y=(-h_timber/2 + a_timber)
-      - We add ~10 m of margin in model coords around x & y.
-    """
-    import math
+    # Create the drawing canvas.
+    d = draw.Drawing(800, 500, origin='center')
 
-    # 1) Model bounding box
-    x_left  = -max(b_concrete/2, b_timber/2) - 10
-    x_right = +max(b_concrete/2, b_timber/2) + 10
-    y_bottom = -h_timber - 10
-    y_top    = h_concrete + 10
+    # Add the timber pattern to the drawing definitions.
+    timber_pattern = get_timber_pattern()
+    d.append(timber_pattern)
 
-    # 2) SVG size, margins
-    svg_width_px = 800
-    svg_height_px = 400
-    margin_px = 50
+    # Wood element (Holzbalken) using the timber pattern.
+    wood_element = draw.Rectangle(-60, 0, 120, 180, stroke='black', stroke_width=2, fill='url(#timber_lines)')
+    wood_element.append_title("Holzbalken")
+    d.append(wood_element)
 
-    model_width = x_right - x_left
-    model_height = y_top - y_bottom
+    # Add the concrete hatch pattern to the drawing definitions.
+    concrete_hatch = get_concrete_hatch()
+    d.append(concrete_hatch)
 
-    usable_w = svg_width_px - 2*margin_px
-    usable_h = svg_height_px - 2*margin_px
+    # Concrete element (Betonplatte) using the hatch pattern for fill.
+    concrete_element = draw.Rectangle(-200, -100, 400, 100, stroke='black', stroke_width=2, fill='url(#concrete_hatch)')
+    concrete_element.append_title("Betonplatte")
+    d.append(concrete_element)
 
-    scale_x = usable_w / model_width   if model_width>0   else 1
-    scale_y = usable_h / model_height if model_height>0   else 1
-    # If you want uniform scale, do scale = min(scale_x, scale_y).
+    d  # Display as SVG    
 
-    def sx(x):
-        """Map model x to SVG x (y-up)."""
-        return margin_px + scale_x*(x - x_left)
-    def sy(y):
-        """Map model y to SVG y (y-up)."""
-        return svg_height_px - margin_px - scale_y*(y - y_bottom)
-
-    d = draw.Drawing(svg_width_px, svg_height_px, origin=(0,0), displayInline=False)
-
-    # 3) Grid lines
-    step = 5
-    for gx in range(int(math.floor(x_left)), int(math.ceil(x_right))+1, step):
-        d.append(draw.Line(sx(gx), sy(y_bottom),
-                           sx(gx), sy(y_top),
-                           stroke='lightgray', stroke_width=0.5))
-    for gy in range(int(math.floor(y_bottom)), int(math.ceil(y_top))+1, step):
-        d.append(draw.Line(sx(x_left), sy(gy),
-                           sx(x_right), sy(gy),
-                           stroke='lightgray', stroke_width=0.5))
-
-    # 4) Concrete slab
-    #    x from [-b_concrete/2, +b_concrete/2], y from [0, h_concrete]
-    slab_left = -b_concrete/2
-    slab_bottom = 0
-    d.append(draw.Rectangle(sx(slab_left), sy(slab_bottom),
-                            scale_x*b_concrete, scale_y*h_concrete,
-                            fill='gray', fill_opacity=0.7))
-
-    # 5) Timber beam
-    #    x from [-b_timber/2, +b_timber/2], y from [-h_timber, 0]
-    beam_left = -b_timber/2
-    beam_bottom = -h_timber
-    d.append(draw.Rectangle(sx(beam_left), sy(beam_bottom),
-                            scale_x*b_timber, scale_y*h_timber,
-                            fill='saddlebrown', fill_opacity=0.7))
-
-    # 6) Connector at (0,0)
-    d.append(draw.Circle(sx(0), sy(0), 4, fill='red'))
-
-    # 7) Dashed line at y=0
-    d.append(draw.Line(sx(x_left), sy(0),
-                       sx(x_right), sy(0),
-                       stroke='black', stroke_width=2, stroke_dasharray="4,2"))
-
-    # 8) Neutral axis if provided
-    if a_timber is not None:
-        na_y = -h_timber/2 + a_timber
-        d.append(draw.Line(sx(x_left), sy(na_y),
-                           sx(x_right), sy(na_y),
-                           stroke='blue', stroke_width=2))
-
-    # 9) Text
-    d.append(draw.Text("Cross-section of TCC Element", 10,
-                       sx(x_left)+5, sy(y_top)-5, fill='black'))
-    # x-label near the bottom
-    d.append(draw.Text("Width (m)", 8,
-                       (sx(x_left)+sx(x_right))/2 - 30,
-                       sy(y_bottom)+15,
-                       fill='black'))
-    # y-label, rotated
-    lx = sx(x_left)+15
-    ly = (sy(y_bottom)+sy(y_top))/2
-    d.append(draw.Text("Height (m)", 8, lx, ly, fill='black',
-                       transform=f"rotate(-90,{lx},{ly})"))
-
-    return d.as_svg()
+        return d.as_svg()
