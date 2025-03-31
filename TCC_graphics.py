@@ -152,7 +152,7 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
     d.append(concrete_hatch)
 
     # Concrete element (Betonplatte) using the hatch pattern for fill.
-    concrete_element = draw.Rectangle(-200, -100, 400, 100, stroke='black', stroke_width=2, fill='url(#concrete_hatch)')
+    concrete_element = draw.Rectangle(-b_concrete*1000/2, -h_concrete*1000, b_concrete*1000, h_concrete*1000, stroke='black', stroke_width=2, fill='url(#concrete_hatch)')
     concrete_element.append_title("Betonplatte")
     d.append(concrete_element)
 
