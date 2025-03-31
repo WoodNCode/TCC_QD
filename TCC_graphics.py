@@ -1,7 +1,7 @@
 import drawsvg as draw
 import math
 import streamlit as st
-from graphics_defs import get_timber_pattern, get_concrete_hatch
+from graphics_defs import get_timber_pattern, get_concrete_hatch, add_horizontal_dimension_line, add_vertical_dimension_line
 
 def render_svg(svg):
     """Renders the given svg string."""
@@ -143,7 +143,7 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
     d.append(timber_pattern)
 
     # Wood element (Holzbalken) using the timber pattern.
-    wood_element = draw.Rectangle(-60, 0, 120, 180, stroke='black', stroke_width=2, fill='url(#timber_lines)')
+    wood_element = draw.Rectangle(-b_timber*1000/2, 0, b_timber*1000, h_timber*1000, stroke='black', stroke_width=2, fill='url(#timber_lines)')
     wood_element.append_title("Holzbalken")
     d.append(wood_element)
 
@@ -155,6 +155,12 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
     concrete_element = draw.Rectangle(-200, -100, 400, 100, stroke='black', stroke_width=2, fill='url(#concrete_hatch)')
     concrete_element.append_title("Betonplatte")
     d.append(concrete_element)
+
+    # Add dimension lines.
+    add_horizontal_dimension_line(d, -b_concrete/2*1000, -h_concrete*1000, b_concrete/2*1000, -20, f"{b_concrete * 1000:.0f} mm")
+    add_horizontal_dimension_line(d, -b_timber/2*1000, h_timber*1000, b_timber/2*1000, 20, f"{b_timber * 1000:.0f} mm")
+    add_vertical_dimension_line(d, -b_timber/2*1000, -0, h_timber*1000, -20, f"{h_timber * 1000:.0f} mm")
+    add_vertical_dimension_line(d, -b_concrete/2*1000, -h_concrete*1000, 0, -20, f"{h_concrete * 1000:.0f} mm")
 
     d  # Display as SVG    
 

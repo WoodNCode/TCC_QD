@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+from TCC_graphics import draw_cross_section
 
 # Import your newly-created modules
 from TCC_EC5_calc import (
@@ -103,6 +104,9 @@ st.pyplot(fig_elevation)
 # Cross-section plot
 fig_cross_sec = plot_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber)
 st.pyplot(fig_cross_sec)
+# Cross Section SVG from external Module
+d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
+st.components.v1.html(d, width=800, height=500)
 
 # Deflection shape plot
 fig_deflection = plot_deflection_shape(x_left, delta_left, x_right, delta_right)
