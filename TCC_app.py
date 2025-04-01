@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-from TCC_graphics import draw_cross_section
+from TCC_graphics import draw_cross_section, create_elevation_view
 
 # Import your newly-created modules
 from TCC_EC5_calc import (
@@ -100,6 +100,8 @@ results = compute_stresses_and_forces(
 # Elevation view plot
 fig_elevation = plot_elevation_view(L, s, P)
 st.pyplot(fig_elevation)
+d_elev = create_elevation_view(L, s, P_kN)
+st.components.v1.html(d_elev, width=800, height=500)
 
 # Cross Section SVG from external Module
 d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
