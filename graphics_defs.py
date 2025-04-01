@@ -49,12 +49,12 @@ def add_horizontal_dimension_line(drawing, x1, y, x2, offset, text_value, tick_l
     delta = tick_length * math.sqrt(2) / 2
 
     # Left tick (centered at (x1, y+offset)).
-    tick_left = draw.Line(x1 - delta, y + offset - delta,
-                          x1 + delta, y + offset + delta,
+    tick_left = draw.Line(x1 + delta, y + offset - delta,
+                          x1 - delta, y + offset + delta,
                           stroke='black', stroke_width=1)
     # Right tick (centered at (x2, y+offset)).
-    tick_right = draw.Line(x2 - delta, y + offset - delta,
-                           x2 + delta, y + offset + delta,
+    tick_right = draw.Line(x2 + delta, y + offset - delta,
+                           x2 - delta, y + offset + delta,
                            stroke='black', stroke_width=1)
     drawing.append(tick_left)
     drawing.append(tick_right)
@@ -91,12 +91,12 @@ def add_vertical_dimension_line(drawing, x, y1, y2, offset, text_value, tick_len
     delta = tick_length * math.sqrt(2) / 2
 
     # Bottom tick (centered at (x+offset, y1)).
-    tick_bottom = draw.Line(x + offset - delta, y1 - delta,
-                            x + offset + delta, y1 + delta,
+    tick_bottom = draw.Line(x + offset + delta, y1 - delta,
+                            x + offset - delta, y1 + delta,
                             stroke='black', stroke_width=1)
     # Top tick (centered at (x+offset, y2)).
-    tick_top = draw.Line(x + offset - delta, y2 - delta,
-                         x + offset + delta, y2 + delta,
+    tick_top = draw.Line(x + offset + delta, y2 - delta,
+                         x + offset - delta, y2 + delta,
                          stroke='black', stroke_width=1)
     drawing.append(tick_bottom)
     drawing.append(tick_top)
