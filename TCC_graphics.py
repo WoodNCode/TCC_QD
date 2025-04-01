@@ -12,91 +12,109 @@ def render_svg(svg):
 
 def create_elevation_view(L, s, P):
     """
-    Creates an elevation view of a beam with:
-      - A horizontal beam line from x=0 to x=L at a fixed y level.
-      - A pinned support at the left end and a roller support at the right end.
-      - A downward load arrow at mid-span (with its reference on the beam line).
-      - Connector markers along the beam at spacing s.
-      
-    Parameters:
-      L : float
-          Total beam length.
-      s : float
-          Spacing for connectors.
-      P : number
-          Load value to display (e.g., in kN or N).
-    
-    Returns:
-      A drawsvg.Drawing object.
-    scale = at the moment fixed scale to make the elevation view fit the width.
+        Creates an elevation view of a beam with:
+        - A horizontal beam line from x=0 to x=L (scaled and offset via a group).
+        - A pinned support at the left end and a roller support at the right end.
+        - A downward load arrow at mid-span (with its reference on the beam line).
+        - Connector markers along the beam at spacing s.
+        
+        Parameters:
+        L : float
+            Total beam length.
+        s : float
+            Spacing for connectors.
+        P : number
+            Load value to display (e.g., in kN or N).
+        
+        Returns:
+        A string containing the SVG markup.
     """
-    scale = 1000/3
-    # Define canvas size and beam level.
-    canvas_width = L*scale + 100    # extra margin on right
-    canvas_height = 150       # enough space above and below the beam
-    beam_y = 100              # y-coordinate of the beam (the beam line)
-    
-    d = draw.Drawing(canvas_width, canvas_height, origin=(0,0))
-    
-    # Draw the beam: horizontal line from x=0 to x=L.
-    beam_line = draw.Line(50, beam_y, 50+ L*scale, beam_y, stroke='black', stroke_width=2)
-    d.append(beam_line)
-    
+
+    # Scale factor applied only to x-coordinates.
+    scale = 600/L
+
+    # Define canvas size.
+    # We add 50 for the left offset and extra margin on the right.
+    canvas_width = L * scale + 50 + 50  
+    canvas_height = 150       
+    beam_y = 100  # y-coordinate of the beam (the beam line)
+    offset_x = (canvas_width - L * scale) / 2
+    offset_y = 0
+
+    # Create the drawing.
+    d = draw.Drawing(canvas_width, canvas_height, origin=(0, 0))
+    # Create a group with a translation of 50 in the x-direction.
+    # All x-coordinates within this group are automatically shifted by 50.
+    g = draw.Group(transform=f"translate({offset_x},{offset_y})")
+
+    # Draw the beam as a horizontal line from x=0 to x=L*scale.
+    beam_line = draw.Line(0, beam_y, L * scale, beam_y, stroke='black', stroke_width=2)
+    g.append(beam_line)
+    dashed_line = draw.Line(0, beam_y + 3, L * scale, beam_y + 3,
+                        stroke='black', stroke_width=0.5,
+                        stroke_dasharray="6,3")
+    g.append(dashed_line)
+
     # Draw connector markers along the beam.
     n_connectors = int(L / s)
     if n_connectors < 1:
         n_connectors = 1
-    connector_positions = np.linspace(s*scale/2, L*scale - s*scale/2, n_connectors)
+    # Compute connector positions along the scaled beam.
+    connector_positions = np.linspace(s * scale / 2, L * scale - s * scale / 2, n_connectors)
     for x in connector_positions:
-        connector = draw.Circle(50+x, beam_y, 3, fill='red', stroke='none')
-        d.append(connector)
-    
+        connector = draw.Circle(x, beam_y, 3, fill='red', stroke='none')
+        g.append(connector)
+
     # Draw supports.
-    # Left support (Pinned): Draw a triangle with its top vertex on the beam.
+    # Left support (Pinned): triangle with top vertex on the beam.
     left_support = draw.Lines(
-        50, beam_y,
-        50-10, beam_y + 20,
-        50+10, beam_y + 20,
+        0, beam_y,           # top vertex on the beam
+        -10, beam_y + 20,    # left bottom
+        10, beam_y + 20,     # right bottom
         close=True,
         fill='gray',
         stroke='black',
         stroke_width=1
     )
-    d.append(left_support)
-    
-    # Right support (Roller): Triangle with its top vertex on the beam.
+    g.append(left_support)
+
+    # Right support (Roller): triangle with top vertex on the beam.
     right_support = draw.Lines(
-        50+L*scale, beam_y,
-        50+L*scale - 10, beam_y + 20,
-        50+L*scale + 10, beam_y + 20,
+        L * scale, beam_y,              # top vertex on the beam
+        L * scale - 10, beam_y + 20,      # left bottom
+        L * scale + 10, beam_y + 20,      # right bottom
         close=True,
         fill='gray',
         stroke='black',
         stroke_width=1
     )
-    d.append(right_support)
-    # Add a Line below the right support to depict the roller.
-    roller = draw.Line(50+L*scale-10, beam_y + 25, 50+L*scale+10, beam_y + 25, fill='gray', stroke='black', stroke_width=1)
-    d.append(roller)
-    
+    g.append(right_support)
+    # Add a line below the right support to depict the roller.
+    roller = draw.Line(L * scale - 10, beam_y + 25, L * scale + 10, beam_y + 25,
+                       stroke='black', stroke_width=1)
+    g.append(roller)
+
     # Create a downward arrow marker for the load.
-    arrow_down = draw.Marker(0, 0, 10, 10, id='arrow_down', markerUnits='strokeWidth',
-                             markerWidth=10, markerHeight=10, refX=5, refY=8, orient="down")
-    arrow_down_path = draw.Path("M 0 0 L 10 0 L 5 8 Z", fill='black')
+    arrow_down = draw.Marker(0, 0, 6, 8, id='arrow_down', markerUnits='strokeWidth',
+                             markerWidth=6, markerHeight=8, refX=3, refY=8, orient="down")
+    arrow_down_path = draw.Path("M 0 0 L 6 0 L 3 8 Z", fill='black')
     arrow_down.append(arrow_down_path)
     d.append(arrow_down)
-    
+
     # Draw the load arrow at mid-span.
     # The arrow starts on the beam and points downward.
-    load_arrow = draw.Line(50+L*scale/2, beam_y - P, 50+L*scale/2, beam_y, stroke='black', stroke_width=2,
-                           marker_end='url(#arrow_down)')
-    d.append(load_arrow)
-    
-    # Add a load label near the arrow.
-    # The label is drawn just below the beam (adjust as needed).
-    load_label = draw.Text(f"{P} kN", 12, 50+L*scale/2, beam_y - P, text_anchor="middle")
-    d.append(load_label)
-    
+    load_arrow = draw.Line(L * scale / 2, beam_y - P, L * scale / 2, beam_y,
+                           stroke='black', stroke_width=2, marker_end='url(#arrow_down)')
+    g.append(load_arrow)
+
+    # Add a load label near the arrow (positioned at mid-span).
+    load_label = draw.Text(f"{P} kN", 12, L * scale / 2, beam_y - P, text_anchor="middle")
+    g.append(load_label)
+
+    # Append the translated group to the drawing.
+    d.append(g)
+    # box = draw.Rectangle(0, 0, canvas_width, canvas_height, fill='none', stroke='black', stroke_width=1)
+    # d.append(box)
     return d.as_svg()
 
 def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None):
@@ -138,5 +156,6 @@ def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None
     add_vertical_dimension_line(d, -b_concrete/2*1000, -h_concrete*1000, 0, -20, f"{h_concrete * 1000:.0f} mm")
     
     add_legend(d)   
-
+    # box = draw.Rectangle(-400, -250, 800, 500, fill='none', stroke='black', stroke_width=1)
+    # d.append(box)
     return d.as_svg()

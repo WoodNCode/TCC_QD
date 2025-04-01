@@ -101,15 +101,21 @@ results = compute_stresses_and_forces(
 fig_elevation = plot_elevation_view(L, s, P)
 st.pyplot(fig_elevation)
 d_elev = create_elevation_view(L, s, P_kN)
-st.components.v1.html(d_elev, width=800, height=500)
+st.components.v1.html(d_elev, width=800)
+st.download_button(
+    label="Download SVG",
+    data=d_elev,
+    file_name="elevation.svg",
+    mime="image/svg+xml"
+)
 
 # Cross Section SVG from external Module
 d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
-st.components.v1.html(d, width=800, height=500)
+st.components.v1.html(d, width=800, height= 500)
 st.download_button(
     label="Download SVG",
     data=d,
-    file_name="drawing.svg",
+    file_name="section.svg",
     mime="image/svg+xml"
 )
 
