@@ -17,6 +17,7 @@ def create_elevation_view(L, s, P):
         - A pinned support at the left end and a roller support at the right end.
         - A downward load arrow at mid-span (with its reference on the beam line).
         - Connector markers along the beam at spacing s.
+        - A dimension line below the beam indicating its length.
         
         Parameters:
         L : float
@@ -31,7 +32,7 @@ def create_elevation_view(L, s, P):
     """
 
     # Scale factor applied only to x-coordinates.
-    scale = 600/L
+    scale = 600 / L
 
     # Define canvas size.
     # We add 50 for the left offset and extra margin on the right.
@@ -43,30 +44,29 @@ def create_elevation_view(L, s, P):
 
     # Create the drawing.
     d = draw.Drawing(canvas_width, canvas_height, origin=(0, 0))
-    # Create a group with a translation of 50 in the x-direction.
-    # All x-coordinates within this group are automatically shifted by 50.
+    # Create a group with a translation for centering.
     g = draw.Group(transform=f"translate({offset_x},{offset_y})")
 
-    # Draw the beam as a horizontal line from x=0 to x=L*scale.
+    # Draw the beam as a horizontal solid line from x=0 to x=L*scale.
     beam_line = draw.Line(0, beam_y, L * scale, beam_y, stroke='black', stroke_width=2)
     g.append(beam_line)
+    # Draw a dashed line 3 units below the beam.
     dashed_line = draw.Line(0, beam_y + 3, L * scale, beam_y + 3,
-                        stroke='black', stroke_width=0.5,
-                        stroke_dasharray="6,3")
+                            stroke='black', stroke_width=0.5,
+                            stroke_dasharray="6,3")
     g.append(dashed_line)
 
     # Draw connector markers along the beam.
     n_connectors = int(L / s)
     if n_connectors < 1:
         n_connectors = 1
-    # Compute connector positions along the scaled beam.
     connector_positions = np.linspace(s * scale / 2, L * scale - s * scale / 2, n_connectors)
     for x in connector_positions:
         connector = draw.Circle(x, beam_y, 3, fill='red', stroke='none')
         g.append(connector)
 
     # Draw supports.
-    # Left support (Pinned): triangle with top vertex on the beam.
+    # Left support (Pinned): triangle with its top vertex on the beam.
     left_support = draw.Lines(
         0, beam_y,           # top vertex on the beam
         -10, beam_y + 20,    # left bottom
@@ -78,7 +78,7 @@ def create_elevation_view(L, s, P):
     )
     g.append(left_support)
 
-    # Right support (Roller): triangle with top vertex on the beam.
+    # Right support (Roller): triangle with its top vertex on the beam.
     right_support = draw.Lines(
         L * scale, beam_y,              # top vertex on the beam
         L * scale - 10, beam_y + 20,      # left bottom
@@ -89,7 +89,7 @@ def create_elevation_view(L, s, P):
         stroke_width=1
     )
     g.append(right_support)
-    # Add a line below the right support to depict the roller.
+    # Draw a line below the right support to depict the roller.
     roller = draw.Line(L * scale - 10, beam_y + 25, L * scale + 10, beam_y + 25,
                        stroke='black', stroke_width=1)
     g.append(roller)
@@ -102,7 +102,6 @@ def create_elevation_view(L, s, P):
     d.append(arrow_down)
 
     # Draw the load arrow at mid-span.
-    # The arrow starts on the beam and points downward.
     load_arrow = draw.Line(L * scale / 2, beam_y - P, L * scale / 2, beam_y,
                            stroke='black', stroke_width=2, marker_end='url(#arrow_down)')
     g.append(load_arrow)
@@ -111,10 +110,13 @@ def create_elevation_view(L, s, P):
     load_label = draw.Text(f"{P} kN", 12, L * scale / 2, beam_y - P, text_anchor="middle")
     g.append(load_label)
 
-    # Append the translated group to the drawing.
+    # Add a dimension line below the beam.
+    # Using the helper function from graphics_defs to draw a horizontal dimension line.
+    # Here, x1=0 and x2=L*scale are the beam endpoints and offset=20 places the line below.
+    add_horizontal_dimension_line(g, 0, beam_y, L * scale, 50, f"{L:.2f} m")
+
+    # Append the group (with all elevation elements) to the drawing.
     d.append(g)
-    # box = draw.Rectangle(0, 0, canvas_width, canvas_height, fill='none', stroke='black', stroke_width=1)
-    # d.append(box)
     return d.as_svg()
 
 def draw_cross_section(b_concrete, h_concrete, b_timber, h_timber, a_timber=None):

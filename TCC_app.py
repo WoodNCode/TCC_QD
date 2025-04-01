@@ -101,7 +101,7 @@ results = compute_stresses_and_forces(
 fig_elevation = plot_elevation_view(L, s, P)
 st.pyplot(fig_elevation)
 d_elev = create_elevation_view(L, s, P_kN)
-st.components.v1.html(d_elev, width=800)
+st.components.v1.html(d_elev, width=800, height= 200)
 st.download_button(
     label="Download SVG",
     data=d_elev,
