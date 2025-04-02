@@ -100,6 +100,7 @@ with tab1:
 
 
 with tab2:
+    TCC_SC = st.number_input(":x: Service Class: (:warning: Safety factors are not yet implemented :warning:)", min_value=1, max_value=4, step=1)
     # ------------------------
     #    CALCULATIONS T=0
     # ------------------------
@@ -151,7 +152,7 @@ with tab2:
     st.markdown("## Timber")
     st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
     st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
-    st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f}")
+    st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f} :x: Characteristic level. No partial safety factors or k_mod")
 
     st.markdown("## Concrete")
     st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
@@ -186,9 +187,12 @@ with tab3:
     st.header("_:red[This Module is not yet implemented]_ :warning:")
 with tab4:
     st.header("_:red[This Module is not yet implemented]_ :warning:")
+
+    TCC_SC = st.number_input("Service Class: SC 4 not allowed", min_value=1, max_value=4, step=1)
     # ------------------------
     #    CALCULATIONS T = ∞
     # ------------------------
+
     # 2) Gamma Factor
     gamma_concrete = compute_gamma_concrete(E_concrete, A_concrete, s, k_ser, L)
 
@@ -237,7 +241,7 @@ with tab4:
     st.markdown("## Timber")
     st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
     st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
-    st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f}")
+    st.write(f"**Utilisation factor in Timber:** :x: Characteristic level. No partial safety factors or k_mod {results['utilisation_timber']:.3f}")
 
     st.markdown("## Concrete")
     st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
