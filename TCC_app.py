@@ -25,7 +25,7 @@ st.title("TCC_QD EC5 Verification")
 st.markdown(
     """
 This app calculates the stresses in a Timber-Concrete Composite (TCC) element using the formulas from EN 1995-1-1 Annex B.
-Below, you can adjust the input parameters from the sidebar.
+You can adjust the general input parameters in the sidebar, below you can adjust for the different time-frames to consider.
 """
 )
 
@@ -36,9 +36,9 @@ E_timber_G = st.sidebar.number_input("Elastic Modulus of Timber (GPa)", value=11
 E_timber = E_timber_G*1000000000
 E_concrete_G = st.sidebar.number_input("Elastic Modulus of Concrete (GPa)", value=33.0, format="%.1f", step=0.1)
 E_concrete = E_concrete_G*1000000000
-f_m_timber_M = st.sidebar.number_input("Bending Strength in MPa", value=24.0, format="%.1f", step=0.1)
+f_m_timber_M = st.sidebar.number_input("Timber Bending Strength in MPa", value=24.0, format="%.1f", step=0.1)
 f_m_timber = f_m_timber_M * 1000*1000
-f_t_timber_M = st.sidebar.number_input("Tensile Strength in MPa", value=14.0, format="%.1f", step=0.1)
+f_t_timber_M = st.sidebar.number_input("Timber Tensile Strength in MPa", value=14.0, format="%.1f", step=0.1)
 f_t_timber = f_t_timber_M * 1000*1000
 h_timber = st.sidebar.number_input("Height of Timber Section (m)", value=0.16)
 b_timber = st.sidebar.number_input("Width of Timber Section (m)", value=0.12)
@@ -47,13 +47,13 @@ b_concrete = st.sidebar.number_input("Width of Concrete Section (m)", value=0.4)
 
 # Connector and load parameters
 s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8)
-k_ser_kN_mm = st.sidebar.slider("Slip Modulus per connector (kN/mm)", min_value=10, max_value=2500, value=90, step=10, format=None, key=None, help="165 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
+k_ser_kN_mm = st.sidebar.slider("Slip Modulus per connector (kN/mm)", min_value=5, max_value=600, value=165, step=5, format=None, key=None, help="165 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 k_ser = k_ser_kN_mm * 1000 * 1000
 # k_ser_kN_mm = st.sidebar.number_input("Slip Modulus per connector (kN/mm)", value=330000000, format="%.2e")
 
-P_kN = st.sidebar.number_input("Point Load (kN)", value=80)
+P_kN = st.sidebar.number_input("Point Load (kN)", value=5)
 P=P_kN*1000
-L = st.sidebar.number_input("Span Length (m)", value=1.6)
+L = st.sidebar.number_input("Span Length (m)", value=6)
 
 # ------------------------
 #    CALCULATIONS OVERALL
