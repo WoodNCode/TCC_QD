@@ -23,9 +23,9 @@ from TCC_report import generate_pdf_report
 st.title("TCC_QD EC5 Verification")
 
 st.markdown(
-    """
-This app calculates the stresses in a Timber-Concrete Composite (TCC) element using the formulas from EN 1995-1-1 Annex B.
-You can adjust the general input parameters in the sidebar, below you can adjust for the different time-frames to consider.
+"""
+    This app calculates the stresses in a Timber-Concrete Composite (TCC) element using the formulas from EN 1995-1-1 Annex B.
+    You can adjust the general input parameters in the sidebar, below you can adjust for the different time-frames to consider.
 """
 )
 
@@ -46,7 +46,7 @@ h_concrete = st.sidebar.number_input("Height of Concrete Section (m)", value=0.1
 b_concrete = st.sidebar.number_input("Width of Concrete Section (m)", value=0.4)
 
 # Connector and load parameters
-s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8)
+s = st.sidebar.number_input("Spacing between connectors (m)", value=0.8, help="(4) Ist der Abstand zwischen den Verbindungen größer als 5 % des Abstands zwischen den Momentennullpunkten, sollten Verbindungen bei Verschmieren proportional zur Schubkraft eingebaut werden. In Ermangelung eines präziseren Modells sollten nur 70 % der axialen Steifigkeit des angeschlossenen Querschnitts für die Berechnung der Spannungen und der Verformung berücksichtigt werden. Bei der Bestimmung der Beanspruchung der Verbindung sollten dagegen 100 % der axialen Steifigkeit des Querschnitts angesetzt werden.")
 k_ser_kN_mm = st.sidebar.slider("Slip Modulus per connector (kN/mm)", min_value=5, max_value=600, value=165, step=5, format=None, key=None, help="165 N/m is the Value for 20 cm TiComTec", on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 k_ser = k_ser_kN_mm * 1000 * 1000
 # k_ser_kN_mm = st.sidebar.number_input("Slip Modulus per connector (kN/mm)", value=330000000, format="%.2e")
