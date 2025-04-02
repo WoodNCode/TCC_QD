@@ -148,23 +148,23 @@ with tab2:
     st.markdown(f"- **Effective Bending Stiffness (EI_eff)**: {EI_eff:.4e} Nm²")
     st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
 
-    st.title("TCC Element Stress Verification Results")
-    st.markdown("## Timber")
+    st.header("TCC Element Stress Verification Results")
+    st.subheader("Timber")
     st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
     st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
     st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f} :x: Characteristic level. No partial safety factors or k_mod")
 
-    st.markdown("## Concrete")
+    st.subheader("Concrete")
     st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
     st.write(f"**Bending Stress in Concrete:** {results['sigma_m_concrete'] / 1e6:.2f} MPa")
     st.write(f"**Bending Moment in Concrete:** {results['M_concrete'] / 1e3:.2f} kNm")
     st.write(f"**Normal Force in Concrete:** {results['N_concrete'] / 1e3:.2f} kN")
 
-    st.markdown("## Timber Shear")
+    st.subheader("Timber Shear")
     st.write(f"**Maximum Shear Stress in Timber:** {results['tau_timber_max'] / 1e6:.2f} MPa")
     st.markdown(f"- **Neutral Axis position from bottom (z) // h according to EC5 B.4:** {results['h_EC_tau']*1000:.2f} mm")
 
-    st.markdown("## Connectors")
+    st.subheader("Connectors")
     st.write(f"**Force in Connector:** {results['F_connector'] / 1e3:.2f} kN")
 
     if st.button("Generate PDF Report", key="generate_pdf_report"):

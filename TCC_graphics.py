@@ -33,6 +33,7 @@ def create_elevation_view(L, s, P):
 
     # Scale factor applied only to x-coordinates.
     scale = 600 / L
+    vertical_scale = 75/P
 
     # Define canvas size.
     # We add 50 for the left offset and extra margin on the right.
@@ -131,12 +132,12 @@ def create_elevation_view(L, s, P):
     d.append(arrow_down)
 
     # Draw the load arrow at mid-span.
-    load_arrow = draw.Line(L * scale / 2, beam_y - P, L * scale / 2, beam_y,
+    load_arrow = draw.Line(L * scale / 2, beam_y - P * vertical_scale, L * scale / 2, beam_y,
                            stroke='black', stroke_width=2, marker_end='url(#arrow_down)')
     g.append(load_arrow)
 
     # Add a load label near the arrow (positioned at mid-span).
-    load_label = draw.Text(f"{P} kN", 12, L * scale / 2, beam_y - P, text_anchor="middle")
+    load_label = draw.Text(f"{P} kN", 12, L * scale / 2, beam_y - P * vertical_scale, text_anchor="middle")
     g.append(load_label)
 
     # Add a dimension line below the beam.
