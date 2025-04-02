@@ -98,10 +98,10 @@ def plot_deflection_shape(x_left, delta_left, x_right, delta_right, show_plot=Tr
     Plots the beam deflection (in mm) vs x (in m).
     """
     fig, ax = plt.subplots(figsize=(8, 4))
-    # Concatenate arrays for a single curve if desired, or keep them separate
-    ax.plot(x_left, delta_left*1e3, label='Deflection (left half) in mm')
-    ax.plot(x_right, delta_right*1e3, label='Deflection (right half) in mm')
-
+    x_total = np.concatenate((x_left, x_right))
+    delta_total = np.concatenate((delta_left, delta_right))
+    ax.plot(x_total, delta_total*1e3, label='Deflection in mm')
+    
     ax.axhline(0, color='black', linestyle='--', linewidth=0.8)
     ax.set_xlabel("Beam Length (m)")
     ax.set_ylabel("Deflection (mm)")

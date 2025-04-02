@@ -56,7 +56,7 @@ P=P_kN*1000
 L = st.sidebar.number_input("Span Length (m)", value=1.6)
 
 # ------------------------
-#    CALCULATIONS
+#    CALCULATIONS OVERALL
 # ------------------------
 
 # 1) Section Properties
@@ -64,109 +64,206 @@ A_timber, I_timber, A_concrete, I_concrete = compute_section_properties(
     b_timber, h_timber, b_concrete, h_concrete
 )
 
-# 2) Gamma Factor
-gamma_concrete = compute_gamma_concrete(E_concrete, A_concrete, s, k_ser, L)
 
-# 3) Neutral Axes
-a_timber, a_concrete = compute_neutral_axes(
-    E_timber, A_timber, E_concrete, A_concrete, h_timber, h_concrete, gamma_concrete
-)
+tab1, tab2, tab3, tab4 = st.tabs(["System", "T = 0", "T = 3 - 7 Jahre", "T = ∞"])
 
-# 4) Effective Bending Stiffness
-EI_eff = compute_effective_bending_stiffness(
-    E_timber, I_timber, A_timber, a_timber,
-    E_concrete, I_concrete, A_concrete, a_concrete,
-    gamma_concrete
-)
+with tab1:
+    # ------------------------
+    #    PLOTTING
+    # ------------------------
 
-# 5) Bending moment and shear
-M_mid, V_max = compute_bending_moment_and_shear(P, L)
-
-# 6) Deflection curve
-x_left, delta_left, x_right, delta_right = compute_deflection(EI_eff, P, L, num_points=50)
-
-# 7) Stresses & forces
-results = compute_stresses_and_forces(
-    E_timber, A_timber, h_timber, f_m_timber, f_t_timber,
-    E_concrete, A_concrete, h_concrete, I_concrete,
-    M_mid, V_max, a_timber, a_concrete, s, EI_eff,
-    gamma_concrete
-)
-
-# ------------------------
-#    PLOTTING
-# ------------------------
-
-# Elevation view plot
-fig_elevation = plot_elevation_view(L, s, P)
-st.pyplot(fig_elevation)
-d_elev = create_elevation_view(L, s, P_kN)
-st.components.v1.html(d_elev, width=800, height= 200)
-st.download_button(
-    label="Download SVG",
-    data=d_elev,
-    file_name="elevation.svg",
-    mime="image/svg+xml"
-)
-
-# Cross Section SVG from external Module
-d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
-st.components.v1.html(d, width=800, height= 500)
-st.download_button(
-    label="Download SVG",
-    data=d,
-    file_name="section.svg",
-    mime="image/svg+xml"
-)
-
-# Deflection shape plot
-fig_deflection = plot_deflection_shape(x_left, delta_left, x_right, delta_right)
-st.pyplot(fig_deflection)
-
-# ------------------------
-#    DISPLAY RESULTS
-# ------------------------
-st.header("Calculated Section Properties")
-st.markdown(f"- **A_timber**: {A_timber:.4f} m²")
-st.markdown(f"- **I_timber**: {I_timber:.4e} m⁴")
-st.markdown(f"- **A_concrete**: {A_concrete:.4f} m²")
-st.markdown(f"- **I_concrete**: {I_concrete:.4e} m⁴")
-st.markdown(f"- **Neutral Axis Distances**: a_timber = {a_timber:.4f} m, a_concrete = {a_concrete:.4f} m")
-st.markdown(f"- **Effective Bending Stiffness (EI_eff)**: {EI_eff:.4e} Nm²")
-st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
-
-st.title("TCC Element Stress Verification Results")
-st.markdown("## Timber")
-st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
-st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
-st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f}")
-
-st.markdown("## Concrete")
-st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
-st.write(f"**Bending Stress in Concrete:** {results['sigma_m_concrete'] / 1e6:.2f} MPa")
-st.write(f"**Bending Moment in Concrete:** {results['M_concrete'] / 1e3:.2f} kNm")
-st.write(f"**Normal Force in Concrete:** {results['N_concrete'] / 1e3:.2f} kN")
-
-st.markdown("## Timber Shear")
-st.write(f"**Maximum Shear Stress in Timber:** {results['tau_timber_max'] / 1e6:.2f} MPa")
-st.markdown(f"- **Neutral Axis position from bottom (z) // h according to EC5 B.4:** {results['h_EC_tau']*1000:.2f} mm")
-
-st.markdown("## Connectors")
-st.write(f"**Force in Connector:** {results['F_connector'] / 1e3:.2f} kN")
-
-if st.button("Generate PDF Report", key="generate_pdf_report"):
-    pdf_data = generate_pdf_report(
-        E_timber_G, E_concrete_G, h_timber, b_timber,
-        h_concrete, b_concrete, s, k_ser, P, L,
-        results['sigma_timber'], results['sigma_m_timber'],
-        results['sigma_concrete'], results['sigma_m_concrete'],
-        results['M_concrete'], results['N_concrete'],
-        results['tau_timber_max'], results['F_connector']
-    )
+    # Elevation view plot
+    # commented out, alternative Way of displaying this
+    # fig_elevation = plot_elevation_view(L, s, P)
+    # st.pyplot(fig_elevation)
+    
+    st.subheader("Structural system", divider="gray")
+    
+    d_elev = create_elevation_view(L, s, P_kN)
+    st.components.v1.html(d_elev, width=800, height= 200)
     st.download_button(
-        label="Download PDF Report",
-        data=pdf_data,
-        file_name="TCC_Stress_Verification_Report.pdf",
-        mime="application/pdf",
-        key="download_pdf_button"
+        label="Download SVG",
+        data=d_elev,
+        file_name="elevation.svg",
+        mime="image/svg+xml"
     )
+    st.subheader("Cross-Section", divider="gray")
+    # Cross Section SVG from external Module
+    d = draw_cross_section(b_concrete, h_concrete, b_timber, h_timber)
+    st.components.v1.html(d, width=800, height= 500)
+    st.download_button(
+        label="Download SVG",
+        data=d,
+        file_name="section.svg",
+        mime="image/svg+xml"
+    )
+
+
+with tab2:
+    # ------------------------
+    #    CALCULATIONS T=0
+    # ------------------------
+    # 2) Gamma Factor
+    gamma_concrete = compute_gamma_concrete(E_concrete, A_concrete, s, k_ser, L)
+
+    # 3) Neutral Axes
+    a_timber, a_concrete = compute_neutral_axes(
+        E_timber, A_timber, E_concrete, A_concrete, h_timber, h_concrete, gamma_concrete
+    )
+
+    # 4) Effective Bending Stiffness
+    EI_eff = compute_effective_bending_stiffness(
+        E_timber, I_timber, A_timber, a_timber,
+        E_concrete, I_concrete, A_concrete, a_concrete,
+        gamma_concrete
+    )
+
+    # 5) Bending moment and shear
+    M_mid, V_max = compute_bending_moment_and_shear(P, L)
+
+    # 6) Deflection curve
+    x_left, delta_left, x_right, delta_right = compute_deflection(EI_eff, P, L, num_points=50)
+
+    # 7) Stresses & forces
+    results = compute_stresses_and_forces(
+        E_timber, A_timber, h_timber, f_m_timber, f_t_timber,
+        E_concrete, A_concrete, h_concrete, I_concrete,
+        M_mid, V_max, a_timber, a_concrete, s, EI_eff,
+        gamma_concrete
+    )
+    # Deflection shape plot
+    fig_deflection = plot_deflection_shape(x_left, delta_left, x_right, delta_right)
+    st.pyplot(fig_deflection)
+
+    # ------------------------
+    #    DISPLAY RESULTS
+    # ------------------------
+    st.header("Calculated Section Properties")
+    st.markdown(f"- **A_timber**: {A_timber:.4f} m²")
+    st.markdown(f"- **I_timber**: {I_timber:.4e} m⁴")
+    st.markdown(f"- **A_concrete**: {A_concrete:.4f} m²")
+    st.markdown(f"- **I_concrete**: {I_concrete:.4e} m⁴")
+    st.markdown(f"- **Neutral Axis Distances**: a_timber = {a_timber:.4f} m, a_concrete = {a_concrete:.4f} m")
+    st.markdown(f"- **Effective Bending Stiffness (EI_eff)**: {EI_eff:.4e} Nm²")
+    st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
+
+    st.title("TCC Element Stress Verification Results")
+    st.markdown("## Timber")
+    st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
+    st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f}")
+
+    st.markdown("## Concrete")
+    st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Stress in Concrete:** {results['sigma_m_concrete'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Moment in Concrete:** {results['M_concrete'] / 1e3:.2f} kNm")
+    st.write(f"**Normal Force in Concrete:** {results['N_concrete'] / 1e3:.2f} kN")
+
+    st.markdown("## Timber Shear")
+    st.write(f"**Maximum Shear Stress in Timber:** {results['tau_timber_max'] / 1e6:.2f} MPa")
+    st.markdown(f"- **Neutral Axis position from bottom (z) // h according to EC5 B.4:** {results['h_EC_tau']*1000:.2f} mm")
+
+    st.markdown("## Connectors")
+    st.write(f"**Force in Connector:** {results['F_connector'] / 1e3:.2f} kN")
+
+    if st.button("Generate PDF Report", key="generate_pdf_report"):
+        pdf_data = generate_pdf_report(
+            E_timber_G, E_concrete_G, h_timber, b_timber,
+            h_concrete, b_concrete, s, k_ser, P, L,
+            results['sigma_timber'], results['sigma_m_timber'],
+            results['sigma_concrete'], results['sigma_m_concrete'],
+            results['M_concrete'], results['N_concrete'],
+            results['tau_timber_max'], results['F_connector']
+        )
+        st.download_button(
+            label="Download PDF Report",
+            data=pdf_data,
+            file_name="TCC_Stress_Verification_Report.pdf",
+            mime="application/pdf",
+            key="download_pdf_button"
+        )
+with tab3:
+    st.header("_:red[This Module is not yet implemented]_ :warning:")
+with tab4:
+    # ------------------------
+    #    CALCULATIONS T = ∞
+    # ------------------------
+    # 2) Gamma Factor
+    gamma_concrete = compute_gamma_concrete(E_concrete, A_concrete, s, k_ser, L)
+
+    # 3) Neutral Axes
+    a_timber, a_concrete = compute_neutral_axes(
+        E_timber, A_timber, E_concrete, A_concrete, h_timber, h_concrete, gamma_concrete
+    )
+
+    # 4) Effective Bending Stiffness
+    EI_eff = compute_effective_bending_stiffness(
+        E_timber, I_timber, A_timber, a_timber,
+        E_concrete, I_concrete, A_concrete, a_concrete,
+        gamma_concrete
+    )
+
+    # 5) Bending moment and shear
+    M_mid, V_max = compute_bending_moment_and_shear(P, L)
+
+    # 6) Deflection curve
+    x_left, delta_left, x_right, delta_right = compute_deflection(EI_eff, P, L, num_points=50)
+
+    # 7) Stresses & forces
+    results = compute_stresses_and_forces(
+        E_timber, A_timber, h_timber, f_m_timber, f_t_timber,
+        E_concrete, A_concrete, h_concrete, I_concrete,
+        M_mid, V_max, a_timber, a_concrete, s, EI_eff,
+        gamma_concrete
+    )
+    # Deflection shape plot
+    fig_deflection = plot_deflection_shape(x_left, delta_left, x_right, delta_right)
+    st.pyplot(fig_deflection)
+
+    # ------------------------
+    #    DISPLAY RESULTS
+    # ------------------------
+    st.header("Calculated Section Properties")
+    st.markdown(f"- **A_timber**: {A_timber:.4f} m²")
+    st.markdown(f"- **I_timber**: {I_timber:.4e} m⁴")
+    st.markdown(f"- **A_concrete**: {A_concrete:.4f} m²")
+    st.markdown(f"- **I_concrete**: {I_concrete:.4e} m⁴")
+    st.markdown(f"- **Neutral Axis Distances**: a_timber = {a_timber:.4f} m, a_concrete = {a_concrete:.4f} m")
+    st.markdown(f"- **Effective Bending Stiffness (EI_eff)**: {EI_eff:.4e} Nm²")
+    st.markdown(f"- **Gamma_concrete**: {gamma_concrete:.4f}")
+
+    st.title("TCC Element Stress Verification Results")
+    st.markdown("## Timber")
+    st.write(f"**Normal Stress in Timber:** {results['sigma_timber'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Stress in Timber:** {results['sigma_m_timber'] / 1e6:.2f} MPa")
+    st.write(f"**Utilisation factor in Timber:** {results['utilisation_timber']:.3f}")
+
+    st.markdown("## Concrete")
+    st.write(f"**Normal Stress in Concrete:** {results['sigma_concrete'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Stress in Concrete:** {results['sigma_m_concrete'] / 1e6:.2f} MPa")
+    st.write(f"**Bending Moment in Concrete:** {results['M_concrete'] / 1e3:.2f} kNm")
+    st.write(f"**Normal Force in Concrete:** {results['N_concrete'] / 1e3:.2f} kN")
+
+    st.markdown("## Timber Shear")
+    st.write(f"**Maximum Shear Stress in Timber:** {results['tau_timber_max'] / 1e6:.2f} MPa")
+    st.markdown(f"- **Neutral Axis position from bottom (z) // h according to EC5 B.4:** {results['h_EC_tau']*1000:.2f} mm")
+
+    st.markdown("## Connectors")
+    st.write(f"**Force in Connector:** {results['F_connector'] / 1e3:.2f} kN")
+
+    if st.button("Generate PDF Report", key="generate_pdf_report inf"):
+        pdf_data = generate_pdf_report(
+            E_timber_G, E_concrete_G, h_timber, b_timber,
+            h_concrete, b_concrete, s, k_ser, P, L,
+            results['sigma_timber'], results['sigma_m_timber'],
+            results['sigma_concrete'], results['sigma_m_concrete'],
+            results['M_concrete'], results['N_concrete'],
+            results['tau_timber_max'], results['F_connector']
+        )
+        st.download_button(
+            label="Download PDF Report",
+            data=pdf_data,
+            file_name="TCC_Stress_Verification_Report.pdf",
+            mime="application/pdf",
+            key="download_pdf_button"
+        )
