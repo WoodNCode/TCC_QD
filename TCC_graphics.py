@@ -37,7 +37,7 @@ def create_elevation_view(L, s, P):
     # Define canvas size.
     # We add 50 for the left offset and extra margin on the right.
     canvas_width = L * scale + 50 + 50  
-    canvas_height = 150       
+    canvas_height = 185       
     beam_y = 100  # y-coordinate of the beam (the beam line)
     offset_x = (canvas_width - L * scale) / 2
     offset_y = 0
@@ -61,9 +61,38 @@ def create_elevation_view(L, s, P):
     if n_connectors < 1:
         n_connectors = 1
     connector_positions = np.linspace(s * scale / 2, L * scale - s * scale / 2, n_connectors)
-    for x in connector_positions:
+    
+    # Draw connector markers along the beam and add dimension lines between segments.
+    beam_start = 0
+    prev_x = beam_start
+    base_offset = 40  # starting vertical offset for the dimension line
+
+    # Iterate over connector positions while drawing markers and dimension lines.
+    for i, x in enumerate(connector_positions):
+        # Draw the connector marker.
         connector = draw.Circle(x, beam_y, 3, fill='red', stroke='none')
         g.append(connector)
+        
+        # Compute offset for the dimension line to avoid overlapping (increment for each segment).
+        offset = base_offset # + i * 10 not really needed
+        # Calculate the real distance (in beam units) by converting back from drawing units.
+        real_distance = (x - prev_x) / scale
+        label = f"{real_distance:.2f} m"
+        
+        # Draw the dimension line for the segment from the previous point to the current connector.
+        add_horizontal_dimension_line(g, prev_x, beam_y, x, offset, label)
+        
+        # Update the previous x to the current connector position.
+        prev_x = x
+
+    # Finally, add a dimension line from the last connector to the end of the beam.
+    beam_end = L * scale
+    offset = base_offset # + len(connector_positions) * 10 (not needed)
+    real_distance = (beam_end - prev_x) / scale
+    label = f"{real_distance:.2f} m"
+    add_horizontal_dimension_line(g, prev_x, beam_y, beam_end, offset, label)
+
+
 
     # Draw supports.
     # Left support (Pinned): triangle with its top vertex on the beam.
@@ -113,7 +142,7 @@ def create_elevation_view(L, s, P):
     # Add a dimension line below the beam.
     # Using the helper function from graphics_defs to draw a horizontal dimension line.
     # Here, x1=0 and x2=L*scale are the beam endpoints and offset=20 places the line below.
-    add_horizontal_dimension_line(g, 0, beam_y, L * scale, 50, f"{L:.2f} m")
+    add_horizontal_dimension_line(g, 0, beam_y, L * scale, 75, f"{L:.2f} m")
 
     # Append the group (with all elevation elements) to the drawing.
     d.append(g)
