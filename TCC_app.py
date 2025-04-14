@@ -51,9 +51,9 @@ k_ser_kN_mm = st.sidebar.slider("Slip Modulus per connector (kN/mm)", min_value=
 k_ser = k_ser_kN_mm * 1000 * 1000
 # k_ser_kN_mm = st.sidebar.number_input("Slip Modulus per connector (kN/mm)", value=330000000, format="%.2e")
 
-P_kN = st.sidebar.number_input("Point Load (kN)", value=5)
+P_kN = st.sidebar.number_input("Point Load (kN)", value=80)
 P=P_kN*1000
-L = st.sidebar.number_input("Span Length (m)", value=6)
+L = st.sidebar.number_input("Span Length (m)", value=1.6, step=0.1)
 
 # ------------------------
 #    CALCULATIONS OVERALL
